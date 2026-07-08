@@ -1,0 +1,2 @@
+const WATER_VS=/*glsl*/`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`;
+const WATER_FS=/*glsl*/`uniform float uT; varying vec2 vUv; void main(){ vec2 uv=vUv*4.; uv.x+=sin(uv.y*3.+uT)*.02; uv.y+=cos(uv.x*2.+uT*.7)*.02; vec3 col=mix(vec3(.1,.3,.6),vec3(.3,.5,.8),.3*(sin(uv.x*10.+uT)*cos(uv.y*8.+uT*.8)*.5+.5)); gl_FragColor=vec4(col,.75); }`;

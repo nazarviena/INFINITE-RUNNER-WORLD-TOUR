@@ -1,0 +1,1544 @@
+==================================================================================================
+  INSTRUÇÕES COMPLETAS PARA CRIAÇÃO DO JOGO "INFINITE RUNNER: WORLD TOUR"
+  VERSÃO 4.0 (DEFINITIVA E FINAL)
+==================================================================================================
+  PROPRIETÁRIO E AUTOR: MagnorioBR
+  EMAIL: Magnoriobr@gmail.com
+  DIREITOS RESERVADOS: Todos os direitos sobre o código, arte, design e conceito 
+                       são de propriedade exclusiva de MagnorioBR.
+==================================================================================================
+
+==================================================================================================
+                           RESUMO EXECUTIVO (LEIA ANTES DE TUDO)
+==================================================================================================
+
+Este documento contém TODAS as instruções para criar o jogo "Infinite Runner: World Tour".
+A IA deve seguir CADA etapa abaixo e NÃO PODE pular nenhuma.
+
+O QUE O JOGO É:
+  - Corrida infinita em PRIMEIRA PESSOA (correndo a pé, NÃO de carro)
+  - Cenários de cidades turísticas (Paris, NY, Tóquio, Londres, Rio)
+  - Geração procedural infinita (mundo que nunca acaba)
+  - Texturas realistas sem repetição
+  - Distância e tempo baseados na VIDA REAL (1km no jogo = 1km real)
+  - Ranking global automático por IP (sem cadastro/senha)
+  - 100% ESTÁTICO (HTML/CSS/JS) para rodar no GitHub Pages
+
+==================================================================================================
+                          PARTE 1: ESTRUTURA DE PASTAS (OBRIGATÓRIA)
+==================================================================================================
+
+A IA DEVE CRIAR EXATAMENTE ESTA ESTRUTURA de pastas e arquivos:
+
+InfiniteRunnerWorldTour/
+│
+├── index.html                    ← Página principal na RAIZ (GitHub Pages exige isso)
+├── style.css                     ← Estilos da UI, menus, HUD, ranking
+├── game.js                       ← Lógica principal (Three.js, jogador, mundo, física)
+├── firebase-config.js            ← Credenciais do Firebase (chaves públicas)
+├── ranking.js                    ← Funções do ranking (enviar, buscar, exibir)
+├── terrain-generator.js          ← CRIAÇÃO DO TERRENO (detalhado na Parte 3)
+│
+├── libs/
+│   ├── three.min.js              ← Three.js (CDN ou local)
+│   ├── cannon-es.js              ← Física (opcional mas recomendado)
+│   └── firebase-app.js           ← SDK Firebase compat
+│
+├── assets/
+│   ├── textures/
+│   │   ├── asphalt/              ← 10 variações de asfalto (.webp)
+│   │   ├── sidewalk/             ← 10 variações de calçada (.webp)
+│   │   ├── grass/                ← 8 variações de grama (.webp)
+│   │   ├── buildings/            ← 30 fachadas de prédios (.webp)
+│   │   ├── roofs/                ← 10 variações de telhado (.webp)
+│   │   ├── terrain/              ← Texturas base do terreno (.webp)
+│   │   ├── trees/                ← Atlas de folhas e troncos (.webp)
+│   │   ├── sky/                  ← Céu dinâmico com nuvens (.webp)
+│   │   └── decals/               ← Grafites, placas, bueiros (.webp)
+│   │
+│   ├── models/
+│   │   ├── trees/                ← 10 modelos de árvores (.glb)
+│   │   ├── furniture/            ← Bancos, lixeiras, postes, semáforos (.glb)
+│   │   ├── buildings/            ← Prédios modulares (.glb)
+│   │   └── terrain/              ← Modelos de terreno (opcional)
+│   │
+│   ├── audio/
+│   │   ├── footsteps/            ← Passos em asfalto, grama, calçada (.mp3)
+│   │   ├── breathing/            ← Respiração ofegante progressiva (.mp3)
+│   │   ├── ambient/              ← Ruído de cidade, pássaros, vento (.mp3)
+│   │   └── ui/                   ← Cliques, conquistas, game over (.mp3)
+│   │
+│   └── fonts/                    ← Fontes para UI (.ttf/.woff)
+│
+├── shaders/
+│   ├── terrainBlend.glsl         ← Shader de mistura de texturas do terreno
+│   ├── water.glsl                ← Shader para fontes/espelhos d'água
+│   └── fog.glsl                  ← Shader de neblina urbana
+│
+├── config/
+│   └── city_params.json          ← Parâmetros de geração da cidade
+│
+├── Tools/                        ← Scripts Python auxiliares
+│   ├── generate_city_blocks.py   ← Gera JSON com layout da cidade
+│   ├── create_texture_variations.py ← Gera variações de textura procedural
+│   ├── download_assets.py        ← BAIXA TODAS AS TEXTURAS, MODELOS E SONS
+│   └── package_build.py          ← Empacota tudo em .zip
+│
+├── README.md                     ← Instruções de jogo, deploy, desenvolvimento
+├── DEVELOPER_GUIDE.md            ← Guia técnico para desenvolvedores
+├── LICENSE                       ← Todos os direitos reservados - MagnorioBR
+└── CREDITS.txt                   ← Fontes de assets e ferramentas
+
+
+==================================================================================================
+                    PARTE 2: DETALHAMENTO COMPLETO DA CRIAÇÃO DO TERRENO
+==================================================================================================
+
+⚠️ IMPORTANTE: Esta é a parte que foi esquecida anteriormente. 
+   O TERRENO é a base de todo o cenário e DEVE ser implementado corretamente.
+
+==================================================================================================
+2.1. CONCEITO DO TERRENO
+==================================================================================================
+
+O terreno é uma malha 3D que forma o chão do mundo. Ele NÃO é apenas um plano 
+simples - é um sistema complexo que inclui:
+
+  - Ruas (asfalto plano para o jogador correr)
+  - Calçadas (levemente elevadas, 15cm acima da rua)
+  - Quarteirões (30cm acima da rua, onde ficam os prédios)
+  - Parques/praças (com grama e pequenas colinas)
+  - Meio-fio (transição entre rua e calçada)
+  - Cruzamentos (a cada 4 blocos)
+  - Bueiros e marcas no asfalto
+
+==================================================================================================
+2.2. ESTRUTURA DE CADA BLOCO DE TERRENO
+==================================================================================================
+
+Cada bloco tem 100m × 100m e é dividido assim:
+
+    ┌──────────────────────────────────────────────┐
+    │  Quarteirão (30cm)    ││    Quarteirão (30cm) │
+    │  [Prédios, grama]     ││    [Prédios, grama]  │
+    │                        ││                      │
+    ├────────────────────────┤├─────────────────────┤
+    │  Calçada (15cm)       ││   Calçada (15cm)     │
+    │  [Árvores, bancos]    ││   [Árvores, bancos]  │
+    ├────────────────────────┴┴─────────────────────┤
+    │                                               │
+    │              RUA (0cm - asfalto)              │
+    │              Largura: 10 metros               │
+    │                                               │
+    ├────────────────────────┬┬─────────────────────┤
+    │  Calçada (15cm)       ││   Calçada (15cm)     │
+    │  [Árvores, bancos]    ││   [Árvores, bancos]  │
+    ├────────────────────────┤├─────────────────────┤
+    │  Quarteirão (30cm)    ││   Quarteirão (30cm) │
+    │  [Prédios, grama]     ││   [Prédios, grama]  │
+    └────────────────────────┴┴─────────────────────┘
+
+DIMENSÕES EXATAS:
+  - Bloco total: 100m × 100m
+  - Rua: 10m de largura (central)
+  - Calçada: 3m de largura (cada lado da rua)
+  - Quarteirão: ~39m de largura (cada lado externo)
+  - Meio-fio: 20cm de largura, 10cm de altura
+
+==================================================================================================
+2.3. ALTURA DO TERRENO (PERLIN NOISE)
+==================================================================================================
+
+O terreno NÃO é totalmente plano. Ele tem variações de altura usando 
+Perlin Noise para simular um terreno natural.
+
+REGRAS DE ALTURA:
+  - RUA: altura constante (0m) - sempre plana para o jogador correr
+  - CALÇADA: altura fixa de 0.15m acima da rua
+  - QUARTEIRÃO: altura base de 0.30m + variação com Perlin Noise (±0.20m)
+  - PARQUE: altura de 0.05m + variação com Perlin Noise (±0.50m) para colinas
+  - TRANSIÇÕES: suaves entre zonas (sem degraus bruscos)
+
+ALGORITMO:
+  1. Criar um PlaneGeometry de 100x100 com 20x20 segmentos
+  2. Para cada vértice, determinar em qual zona ele está (rua, calçada, etc.)
+  3. Aplicar altura base de acordo com a zona
+  4. Adicionar ruído Perlin para variação natural (apenas nos quarteirões/parques)
+  5. Suavizar as transições entre zonas com um fator de blend
+
+==================================================================================================
+2.4. TEXTURIZAÇÃO DO TERRENO (BLEND MAPPING)
+==================================================================================================
+
+PROBLEMA: Como evitar que as texturas se repitam no mesmo bloco?
+
+SOLUÇÃO: Sistema de 4 camadas com Blend Shader
+
+CAMADA 1: Mapa de Controle (Blend Map)
+  - Textura em tons de cinza que define qual textura usar em cada ponto
+  - Canal R: Intensidade do asfalto
+  - Canal G: Intensidade da calçada  
+  - Canal B: Intensidade da grama
+  - Canal A: Intensidade da terra
+
+CAMADA 2: Asfalto (Rua)
+  - 10 variações de textura
+  - Cada bloco escolhe uma variação baseada na seed (posição x,z)
+  - UVs rotacionados e escalados aleatoriamente para evitar padrões
+
+CAMADA 3: Calçada
+  - 10 variações de textura
+  - Mesmo sistema de seed
+
+CAMADA 4: Grama/Terra (Quarteirão)
+  - 8 variações de grama + 5 de terra
+  - Aplicadas nas áreas de quarteirão e parques
+
+SHADER DE BLEND (terrainBlend.glsl):
+  - Recebe as 4 texturas + o blend map
+  - Para cada pixel, lê o blend map e mistura as texturas proporcionalmente
+  - Adiciona iluminação (normal map + specular)
+  - Aplica correção gamma
+
+==================================================================================================
+2.5. SHADER DE BLEND DO TERRENO (CÓDIGO COMPLETO)
+==================================================================================================
+
+O arquivo terrainBlend.glsl deve conter:
+
+--- VERTEX SHADER ---
+varying vec2 vUv;
+varying vec3 vWorldPos;
+varying vec3 vNormal;
+varying vec3 vViewDir;
+
+void main() {
+    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+    vWorldPos = worldPos.xyz;
+    vUv = uv;
+    vNormal = normalize(mat3(modelMatrix) * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewDir = normalize(-mvPosition.xyz);
+    gl_Position = projectionMatrix * mvPosition;
+}
+
+--- FRAGMENT SHADER ---
+uniform sampler2D uAsphaltTex;
+uniform sampler2D uSidewalkTex;
+uniform sampler2D uGrassTex;
+uniform sampler2D uTerrainTex;
+uniform sampler2D uBlendMap;
+uniform vec3 uLightDir;
+uniform float uTime;
+
+varying vec2 vUv;
+varying vec3 vWorldPos;
+varying vec3 vNormal;
+varying vec3 vViewDir;
+
+void main() {
+    // Amostrar blend map
+    vec4 blend = texture2D(uBlendMap, vUv * 5.0);
+    
+    // UVs diferentes para cada textura (evita repetição)
+    vec2 asphaltUV = vUv * 15.0 + vec2(0.13, 0.27);
+    vec2 sidewalkUV = vUv * 20.0 + vec2(0.07, 0.33);
+    vec2 grassUV = vUv * 25.0 + vec2(0.17, 0.11);
+    vec2 terrainUV = vUv * 30.0 + vec2(0.23, 0.19);
+    
+    // Amostrar texturas
+    vec4 asphalt = texture2D(uAsphaltTex, asphaltUV);
+    vec4 sidewalk = texture2D(uSidewalkTex, sidewalkUV);
+    vec4 grass = texture2D(uGrassTex, grassUV);
+    vec4 terrain = texture2D(uTerrainTex, terrainUV);
+    
+    // Normalizar pesos
+    float total = blend.r + blend.g + blend.b + blend.a;
+    vec4 weights = blend / max(total, 0.001);
+    
+    // Misturar
+    vec3 albedo = asphalt.rgb * weights.r +
+                  sidewalk.rgb * weights.g +
+                  grass.rgb * weights.b +
+                  terrain.rgb * weights.a;
+    
+    // Iluminação simples
+    float NdotL = max(dot(vNormal, uLightDir), 0.0);
+    float ambient = 0.25;
+    float diffuse = ambient + NdotL * 0.75;
+    
+    vec3 color = albedo * diffuse;
+    
+    // Fresnel para poças d'água no asfalto
+    float fresnel = pow(1.0 - abs(dot(vNormal, vViewDir)), 3.0);
+    color += vec3(0.05, 0.06, 0.08) * fresnel * weights.r;
+    
+    gl_FragColor = vec4(color, 1.0);
+}
+
+==================================================================================================
+2.6. CÓDIGO DO TERRAIN GENERATOR (terrain-generator.js)
+==================================================================================================
+
+O arquivo terrain-generator.js deve conter a classe completa de geração do terreno:
+
+class TerrainGenerator {
+    constructor(scene, textureManager) {
+        this.scene = scene;
+        this.textureManager = textureManager;
+        this.blocks = new Map();           // Blocos ativos
+        this.blockPool = [];               // Pool de blocos reutilizáveis
+        this.blockSize = 100;              // 100 metros
+        this.segments = 20;               // Subdivisões por bloco
+        this.roadWidth = 10;
+        this.sidewalkWidth = 3;
+        this.viewDistance = 5;            // Blocos visíveis ao redor
+    }
+
+    // Hash determinístico baseado na posição
+    hashPosition(x, z) {
+        let h = x * 374761393 + z * 668265263;
+        h = (h ^ (h >> 13)) * 1274126177;
+        return h ^ (h >> 16);
+    }
+
+    // Gerador de números pseudo-aleatórios com seed
+    seededRandom(seed) {
+        let s = seed;
+        return function() {
+            s = (s * 16807 + 0) % 2147483647;
+            return (s - 1) / 2147483646;
+        };
+    }
+
+    // Perlin Noise simplificado para altura do terreno
+    perlinNoise(x, z, seed) {
+        const n = Math.sin(x * 12.9898 + z * 78.233 + seed) * 43758.5453;
+        return n - Math.floor(n);
+    }
+
+    // Smooth noise para transições suaves
+    smoothNoise(x, z, seed, scale) {
+        const nx = x / scale;
+        const nz = z / scale;
+        const ix = Math.floor(nx);
+        const iz = Math.floor(nz);
+        const fx = nx - ix;
+        const fz = nz - iz;
+        
+        // Suavizar com curva cúbica
+        const sx = fx * fx * (3 - 2 * fx);
+        const sz = fz * fz * (3 - 2 * fz);
+        
+        const n00 = this.perlinNoise(ix, iz, seed);
+        const n10 = this.perlinNoise(ix + 1, iz, seed);
+        const n01 = this.perlinNoise(ix, iz + 1, seed);
+        const n11 = this.perlinNoise(ix + 1, iz + 1, seed);
+        
+        const nx0 = n00 + (n10 - n00) * sx;
+        const nx1 = n01 + (n11 - n01) * sx;
+        
+        return nx0 + (nx1 - nx0) * sz;
+    }
+
+    // Determina o tipo de zona para uma coordenada local
+    getZoneType(localX, localZ) {
+        const halfBlock = this.blockSize / 2;
+        const halfRoad = this.roadWidth / 2;
+        const sidewalkEnd = halfRoad + this.sidewalkWidth;
+        
+        // Converter para coordenadas dentro do bloco
+        const absX = Math.abs(localX);
+        const absZ = Math.abs(localZ);
+        
+        // Rua (central, eixo Z)
+        if (absX < halfRoad) return 'road';
+        
+        // Calçada
+        if (absX < sidewalkEnd) return 'sidewalk';
+        
+        // Quarteirão
+        if (absX < halfBlock && absZ < halfBlock) return 'block';
+        
+        return 'boundary';
+    }
+
+    // Calcula a altura do terreno para um ponto
+    getHeight(localX, localZ, seed) {
+        const zone = this.getZoneType(localX, localZ);
+        const rand = this.seededRandom(seed);
+        
+        switch(zone) {
+            case 'road':
+                return 0.0;  // Rua sempre plana
+                
+            case 'sidewalk':
+                // Calçada 15cm acima, com leve inclinação para drenagem
+                const distFromRoad = Math.abs(localX) - this.roadWidth / 2;
+                const slope = distFromRoad / this.sidewalkWidth;
+                return 0.15 + slope * 0.02;  // 15cm + 2% de inclinação
+                
+            case 'block':
+                // Quarteirão a 30cm, com variação Perlin
+                const noise = this.smoothNoise(localX, localZ, seed, 20);
+                return 0.30 + noise * 0.20;  // 30cm ± 20cm
+                
+            case 'boundary':
+                return 0.0;
+        }
+    }
+
+    // Gera o blend map para texturização
+    generateBlendMap(bx, bz) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        
+        const halfRoad = this.roadWidth / 2;
+        const sidewalkEnd = halfRoad + this.sidewalkWidth;
+        
+        for (let y = 0; y < 512; y++) {
+            for (let x = 0; x < 512; x++) {
+                // Converter para coordenadas do bloco (-50 a 50)
+                const localX = (x / 512) * this.blockSize - this.blockSize / 2;
+                const absX = Math.abs(localX);
+                
+                let r = 0, g = 0, b = 0, a = 0;
+                
+                if (absX < halfRoad) {
+                    r = 1;  // Asfalto (canal vermelho)
+                } else if (absX < halfRoad + 0.5) {
+                    // Transição rua -> calçada (meio-fio)
+                    const t = (absX - halfRoad) / 0.5;
+                    r = 1 - t;
+                    g = t;
+                } else if (absX < sidewalkEnd) {
+                    g = 1;  // Calçada (canal verde)
+                } else if (absX < sidewalkEnd + 1) {
+                    // Transição calçada -> quarteirão
+                    const t = (absX - sidewalkEnd) / 1.0;
+                    g = 1 - t;
+                    b = t;  // Grama (canal azul)
+                } else {
+                    b = 0.7;  // Grama
+                    a = 0.3;  // Terra
+                }
+                
+                const px = (x + y * 512) * 4;
+                const imageData = ctx.createImageData(1, 1);
+                imageData.data[0] = Math.floor(r * 255);
+                imageData.data[1] = Math.floor(g * 255);
+                imageData.data[2] = Math.floor(b * 255);
+                imageData.data[3] = Math.floor(a * 255);
+                ctx.putImageData(imageData, x, y);
+            }
+        }
+        
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = THREE.ClampToEdgeWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        return texture;
+    }
+
+    // Cria um bloco de terreno completo
+    createTerrainBlock(bx, bz) {
+        const seed = this.hashPosition(bx, bz);
+        const rand = this.seededRandom(seed);
+        
+        // Geometria do terreno
+        const geometry = new THREE.PlaneGeometry(
+            this.blockSize, this.blockSize,
+            this.segments, this.segments
+        );
+        geometry.rotateX(-Math.PI / 2);
+        
+        // Aplicar alturas
+        const positions = geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+            const localX = positions[i];
+            const localZ = positions[i + 2];
+            positions[i + 1] = this.getHeight(localX, localZ, seed);
+        }
+        geometry.computeVertexNormals();
+        
+        // Blend map
+        const blendMap = this.generateBlendMap(bx, bz);
+        
+        // Texturas para este bloco (seed determina qual variação)
+        const asphaltTex = this.textureManager.getTexture('asphalt', seed);
+        const sidewalkTex = this.textureManager.getTexture('sidewalk', seed + 1000);
+        const grassTex = this.textureManager.getTexture('grass', seed + 2000);
+        const terrainTex = this.textureManager.getTexture('terrain', seed + 3000);
+        
+        // Material com shader de blend
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                uAsphaltTex: { value: asphaltTex },
+                uSidewalkTex: { value: sidewalkTex },
+                uGrassTex: { value: grassTex },
+                uTerrainTex: { value: terrainTex },
+                uBlendMap: { value: blendMap },
+                uLightDir: { value: new THREE.Vector3(0.5, 1.0, 0.3).normalize() },
+                uTime: { value: 0 }
+            },
+            vertexShader: TERRAIN_VERTEX_SHADER,
+            fragmentShader: TERRAIN_FRAGMENT_SHADER
+        });
+        
+        // Mesh do terreno
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(bx * this.blockSize, 0, bz * this.blockSize);
+        mesh.receiveShadow = true;
+        
+        // Grupo para conter terreno + elementos
+        const group = new THREE.Group();
+        group.add(mesh);
+        group.position.copy(mesh.position);
+        mesh.position.set(0, 0, 0);  // Relativo ao grupo
+        
+        // Meio-fio
+        this.addCurbs(group, seed);
+        
+        // Marcas no asfalto
+        this.addRoadMarkings(group, seed);
+        
+        return group;
+    }
+
+    // Adiciona meio-fio entre rua e calçada
+    addCurbs(group, seed) {
+        const rand = this.seededRandom(seed);
+        const halfRoad = this.roadWidth / 2;
+        const curbGeo = new THREE.BoxGeometry(0.2, 0.10, this.blockSize);
+        const curbMat = new THREE.MeshStandardMaterial({
+            color: 0x888888,
+            roughness: 0.6,
+            metalness: 0.1
+        });
+        
+        for (let side = -1; side <= 1; side += 2) {
+            const curb = new THREE.Mesh(curbGeo, curbMat);
+            curb.position.set(side * halfRoad, 0.05, 0);
+            curb.castShadow = true;
+            curb.receiveShadow = true;
+            group.add(curb);
+        }
+    }
+
+    // Adiciona marcações na rua (faixa central, faixas de pedestre)
+    addRoadMarkings(group, seed) {
+        const rand = this.seededRandom(seed);
+        
+        // Faixa central tracejada (amarela)
+        const dashGeo = new THREE.PlaneGeometry(0.3, 4);
+        const dashMat = new THREE.MeshStandardMaterial({
+            color: 0xffcc00,
+            roughness: 0.5,
+            emissive: 0x111100
+        });
+        
+        for (let z = -this.blockSize/2 + 2; z < this.blockSize/2; z += 8) {
+            const dash = new THREE.Mesh(dashGeo, dashMat);
+            dash.rotation.x = -Math.PI / 2;
+            dash.position.set(0, 0.02, z);
+            group.add(dash);
+        }
+    }
+
+    // Atualiza os blocos visíveis baseado na posição do jogador
+    update(playerX, playerZ) {
+        const px = Math.floor(playerX / this.blockSize);
+        const pz = Math.floor(playerZ / this.blockSize);
+        
+        // Calcular blocos necessários
+        const neededBlocks = new Set();
+        for (let dx = -this.viewDistance; dx <= this.viewDistance; dx++) {
+            for (let dz = -this.viewDistance; dz <= this.viewDistance; dz++) {
+                neededBlocks.add(`${px + dx},${pz + dz}`);
+            }
+        }
+        
+        // Remover blocos distantes
+        for (const [key, block] of this.blocks) {
+            if (!neededBlocks.has(key)) {
+                this.scene.remove(block);
+                this.blocks.delete(key);
+            }
+        }
+        
+        // Criar novos blocos
+        for (const key of neededBlocks) {
+            if (!this.blocks.has(key)) {
+                const [bx, bz] = key.split(',').map(Number);
+                const block = this.createTerrainBlock(bx, bz);
+                this.scene.add(block);
+                this.blocks.set(key, block);
+            }
+        }
+    }
+}
+
+==================================================================================================
+2.7. LISTA DE VERIFICAÇÃO DO TERRENO
+==================================================================================================
+
+A IA DEVE CONFIRMAR que o terreno tem:
+  □ Blocos de 100m × 100m com 20×20 segmentos
+  □ Ruas com 10m de largura (planas, altura 0)
+  □ Calçadas com 3m de largura (15cm de altura)
+  □ Quarteirões (~39m cada lado, 30cm de altura)
+  □ Altura variável com Perlin Noise nos quarteirões
+  □ Meio-fio entre rua e calçada
+  □ Blend Map para texturização (4 canais)
+  □ Shader de blend funcionando (terrainBlend.glsl)
+  □ Texturas diferentes para cada bloco (sem repetição)
+  □ Marcações na rua (faixa central amarela)
+  □ Geração procedural com pooling
+  □ Transições suaves entre zonas (sem degraus)
+
+
+==================================================================================================
+                       PARTE 3: SISTEMA DE RANKING GLOBAL POR IP
+==================================================================================================
+
+3.1. CONFIGURAÇÃO DO FIREBASE
+--------------------------------------------------------------------------------------------------
+
+A IA DEVE:
+  1. Criar um projeto no Firebase Console (https://console.firebase.google.com/)
+  2. Ativar o Realtime Database
+  3. Configurar as regras de segurança (modo teste para dev):
+
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "rankings": {
+      ".indexOn": ["distancia"]
+    }
+  }
+}
+
+  4. Obter as credenciais do projeto (apiKey, projectId, etc.)
+  5. Colocar as credenciais em firebase-config.js
+
+3.2. ARQUIVO firebase-config.js
+--------------------------------------------------------------------------------------------------
+
+const firebaseConfig = {
+    apiKey: "SUA_API_KEY_AQUI",
+    authDomain: "SEU_PROJETO.firebaseapp.com",
+    databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+    projectId: "SEU_PROJETO",
+    storageBucket: "SEU_PROJETO.appspot.com",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId: "SEU_APP_ID"
+};
+
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+3.3. ARQUIVO ranking.js (FUNÇÕES COMPLETAS)
+--------------------------------------------------------------------------------------------------
+
+// Obter IP do jogador (via API pública)
+async function getPlayerIP() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        console.error('Erro ao obter IP:', error);
+        return 'unknown';
+    }
+}
+
+// Mascarar IP para privacidade
+function maskIP(ip) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+        return `${parts[0]}.${parts[1]}.***.***`;
+    }
+    return ip;
+}
+
+// Enviar pontuação para o ranking
+async function sendScore(ip, distanciaKm, marcos, tempo) {
+    try {
+        const safeKey = ip.replace(/\./g, '_');
+        const ref = database.ref('rankings/' + safeKey);
+        
+        // Buscar pontuação existente
+        const snapshot = await ref.once('value');
+        const existing = snapshot.val();
+        
+        // Só atualizar se a nova distância for MAIOR
+        if (!existing || distanciaKm > existing.distancia) {
+            await ref.set({
+                ip: ip,
+                distancia: parseFloat(distanciaKm.toFixed(2)),
+                marcos: marcos,
+                tempo: tempo,
+                data: new Date().toISOString()
+            });
+            return true; // Novo recorde
+        }
+        return false; // Não superou o recorde anterior
+    } catch (error) {
+        console.error('Erro ao enviar pontuação:', error);
+        return false;
+    }
+}
+
+// Buscar ranking (top 100)
+async function getRanking(limit = 100) {
+    try {
+        const ref = database.ref('rankings');
+        const snapshot = await ref
+            .orderByChild('distancia')
+            .limitToLast(limit)
+            .once('value');
+        
+        const data = snapshot.val();
+        const ranking = [];
+        
+        if (data) {
+            for (let key in data) {
+                ranking.push(data[key]);
+            }
+        }
+        
+        // Ordenar por distância (maior primeiro)
+        ranking.sort((a, b) => b.distancia - a.distancia);
+        
+        return ranking;
+    } catch (error) {
+        console.error('Erro ao buscar ranking:', error);
+        return [];
+    }
+}
+
+// Buscar posição do jogador no ranking
+async function getPlayerRank(ip) {
+    try {
+        const ranking = await getRanking(1000); // Buscar todos
+        const index = ranking.findIndex(item => item.ip === ip);
+        return index + 1; // 1-indexed
+    } catch (error) {
+        console.error('Erro ao buscar posição:', error);
+        return null;
+    }
+}
+
+// Formatar data para exibição
+function formatDate(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleDateString('pt-BR') + ' ' + 
+           date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+3.4. EXIBIÇÃO DO RANKING (HTML/CSS)
+--------------------------------------------------------------------------------------------------
+
+A tabela de ranking deve ser exibida em:
+  1. Menu principal (botão "RANKING GLOBAL")
+  2. Tela de Game Over (após enviar a pontuação)
+
+ESTRUTURA HTML DA TABELA:
+
+<div id="ranking-modal" class="modal">
+    <div class="modal-content">
+        <h2>🏆 RANKING GLOBAL</h2>
+        <div class="ranking-table-container">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th>Pos.</th>
+                        <th>Jogador (IP)</th>
+                        <th>Distância</th>
+                        <th>Marcos</th>
+                        <th>Tempo</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-tbody">
+                    <!-- Preenchido via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <p id="player-rank-text">Sua posição: --</p>
+        <button id="btn-close-ranking" class="menu-btn">FECHAR</button>
+    </div>
+</div>
+
+FUNÇÃO PARA RENDERIZAR RANKING:
+
+async function renderRanking() {
+    const tbody = document.getElementById('ranking-tbody');
+    tbody.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
+    
+    const ranking = await getRanking(50);
+    const playerIP = await getPlayerIP();
+    
+    tbody.innerHTML = '';
+    
+    ranking.forEach((item, index) => {
+        const row = document.createElement('tr');
+        const isPlayer = item.ip === playerIP;
+        
+        // Destacar a linha do jogador
+        if (isPlayer) {
+            row.classList.add('player-row');
+        }
+        
+        // Medalhas para top 3
+        let posDisplay = `${index + 1}º`;
+        if (index === 0) posDisplay = '🥇 1º';
+        else if (index === 1) posDisplay = '🥈 2º';
+        else if (index === 2) posDisplay = '🥉 3º';
+        
+        row.innerHTML = `
+            <td>${posDisplay}</td>
+            <td>${maskIP(item.ip)}</td>
+            <td>${item.distancia.toFixed(2)} km</td>
+            <td>${item.marcos} marcos</td>
+            <td>${item.tempo}</td>
+            <td>${formatDate(item.data)}</td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Mostrar posição do jogador
+    const playerRank = await getPlayerRank(playerIP);
+    document.getElementById('player-rank-text').textContent = 
+        playerRank ? `Sua posição: ${playerRank}º de ${ranking.length} jogadores` 
+                   : 'Jogue para aparecer no ranking!';
+}
+
+// Atualizar ranking automaticamente a cada 15 segundos
+setInterval(renderRanking, 15000);
+
+
+==================================================================================================
+                PARTE 4: SISTEMA DE DISTÂNCIA E TEMPO 100% REALISTAS
+==================================================================================================
+
+⚠️ CRÍTICO: A distância e o tempo DEVEM ser baseados na VIDA REAL.
+
+4.1. VELOCIDADES REAIS
+--------------------------------------------------------------------------------------------------
+
+  - CORRIDA LEVE (W):     8 km/h  =  2.222 m/s
+  - SPRINT (Shift+W):    12 km/h  =  3.333 m/s
+  - CAMINHADA (sem W):    0 km/h  =  0.000 m/s
+
+4.2. TEMPO REAL PARA ATINGIR MARCOS
+--------------------------------------------------------------------------------------------------
+
+  Marco 1km:   7 minutos e 30 segundos  (450 segundos)
+  Marco 2km:  15 minutos e  0 segundos  (900 segundos)
+  Marco 4km:  30 minutos e  0 segundos  (1800 segundos)
+  Marco 8km:  60 minutos e  0 segundos  (3600 segundos)
+  Marco 16km: 120 minutos e 0 segundos  (7200 segundos)
+  Marco 32km: 240 minutos e 0 segundos  (14400 segundos = 4 horas!)
+
+  Com SPRINT (12 km/h):
+  Marco 1km:   5 minutos e  0 segundos
+  Marco 2km:  10 minutos e  0 segundos
+  Marco 4km:  20 minutos e  0 segundos
+  Marco 8km:  40 minutos e  0 segundos
+
+4.3. CÁLCULO EXATO
+--------------------------------------------------------------------------------------------------
+
+  distanciaMetros = velocidadeMS * tempoSegundos
+
+  ONDE:
+    velocidadeMS = 2.222 (corrida) ou 3.333 (sprint)
+    tempoSegundos = Date.now() - startTime (em milissegundos, dividir por 1000)
+
+  EXEMPLO:
+    Correndo por 450 segundos a 2.222 m/s:
+    distancia = 2.222 * 450 = 999.9 metros ≈ 1.0 km ✅
+
+4.4. CÓDIGO DO SISTEMA DE TEMPO/DISTÂNCIA
+--------------------------------------------------------------------------------------------------
+
+class ScoreSystem {
+    constructor() {
+        this.startTime = 0;
+        this.elapsedTime = 0;       // segundos
+        this.distanceMeters = 0;    // metros
+        this.baseSpeed = 2.222;     // 8 km/h em m/s
+        this.sprintSpeed = 3.333;   // 12 km/h em m/s
+        this.currentSpeed = 0;
+        this.isRunning = false;
+        this.isSprinting = false;
+        
+        // Marcos exponenciais
+        this.milestones = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+        this.milestonesReached = [];
+        this.nextMilestone = 1;
+    }
+    
+    start() {
+        this.startTime = performance.now();
+        this.isRunning = true;
+    }
+    
+    update(isSprinting) {
+        if (!this.isRunning) return;
+        
+        this.isSprinting = isSprinting;
+        
+        // Tempo decorrido em segundos (alta precisão)
+        const now = performance.now();
+        this.elapsedTime = (now - this.startTime) / 1000;
+        
+        // Velocidade atual
+        this.currentSpeed = isSprinting ? this.sprintSpeed : this.baseSpeed;
+        
+        // Distância = velocidade × tempo
+        this.distanceMeters = this.currentSpeed * this.elapsedTime;
+        
+        // Verificar marcos
+        const distanceKm = this.distanceMeters / 1000;
+        if (distanceKm >= this.nextMilestone) {
+            this.reachMilestone(this.nextMilestone);
+        }
+    }
+    
+    reachMilestone(km) {
+        this.milestonesReached.push(km);
+        
+        // Encontrar o próximo marco (dobro)
+        const currentIndex = this.milestones.indexOf(km);
+        if (currentIndex >= 0 && currentIndex < this.milestones.length - 1) {
+            this.nextMilestone = this.milestones[currentIndex + 1];
+        } else {
+            this.nextMilestone *= 2; // Continua dobrando infinitamente
+        }
+        
+        // Disparar evento de conquista
+        if (this.onMilestoneReached) {
+            this.onMilestoneReached(km);
+        }
+    }
+    
+    getDistanceKm() {
+        return this.distanceMeters / 1000;
+    }
+    
+    getDistanceFormatted() {
+        return (this.distanceMeters / 1000).toFixed(2) + ' km';
+    }
+    
+    getTimeFormatted() {
+        const totalSeconds = Math.floor(this.elapsedTime);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        if (hours > 0) {
+            return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+        }
+        return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+    }
+    
+    getPaceFormatted() {
+        // Ritmo em minutos por km
+        if (this.distanceMeters < 10) return '--:--';
+        const paceSeconds = this.elapsedTime / (this.distanceMeters / 1000);
+        const paceMin = Math.floor(paceSeconds / 60);
+        const paceSec = Math.floor(paceSeconds % 60);
+        return `${paceMin}:${String(paceSec).padStart(2,'0')} /km`;
+    }
+    
+    getAverageSpeedKmh() {
+        if (this.elapsedTime < 1) return 0;
+        return (this.distanceMeters / 1000) / (this.elapsedTime / 3600);
+    }
+    
+    getMilestonesCount() {
+        return this.milestonesReached.length;
+    }
+    
+    getLastMilestone() {
+        if (this.milestonesReached.length === 0) return 0;
+        return this.milestonesReached[this.milestonesReached.length - 1];
+    }
+}
+
+
+==================================================================================================
+                     PARTE 5: SISTEMA DE GERAÇÃO PROCEDURAL DE CENÁRIO
+==================================================================================================
+
+5.1. BLOCOS DE 100m × 100m
+--------------------------------------------------------------------------------------------------
+
+Cada bloco é um quarteirão urbano completo com:
+  - Terreno com altura variável (Parte 2)
+  - Prédios com fachadas únicas
+  - Árvores com variações
+  - Mobiliário urbano
+  - Iluminação (postes)
+
+5.2. TEMAS DE BLOCOS (BASEADOS NA POSIÇÃO)
+--------------------------------------------------------------------------------------------------
+
+  CENTRO URBANO (urban):
+    - Prédios altos (15-30 andares)
+    - Fachadas de vidro e metal
+    - Muitas luzes
+    - Calçadas largas
+
+  BAIRRO RESIDENCIAL (residential):
+    - Prédios médios (3-10 andares)
+    - Fachadas de tijolo e pintura
+    - Árvores nas calçadas
+    - Jardins
+
+  COMERCIAL (commercial):
+    - Prédios baixos e largos (2-5 andares)
+    - Lojas no térreo
+    - Letreiros luminosos
+    - Estacionamentos
+
+  PARQUE (park):
+    - Sem prédios
+    - Muita grama e árvores
+    - Lagos e fontes
+    - Bancos e trilhas
+
+  PRAIA (beach):
+    - Areia e palmeiras
+    - Quiosques
+    - Calçadão
+    - Vista para o mar
+
+5.3. CÓDIGO DE GERAÇÃO DE PRÉDIOS
+--------------------------------------------------------------------------------------------------
+
+class BuildingGenerator {
+    constructor(textureManager) {
+        this.textureManager = textureManager;
+    }
+    
+    createBuildingsForBlock(seed, theme, blockX, blockZ) {
+        const buildings = [];
+        const rand = this.seededRandom(seed);
+        
+        // Configurações por tema
+        const configs = {
+            urban:      { minFloors: 15, maxFloors: 30, density: 0.8 },
+            residential:{ minFloors: 3,  maxFloors: 10, density: 0.6 },
+            commercial: { minFloors: 2,  maxFloors: 8,  density: 0.7 },
+            park:       { minFloors: 0,  maxFloors: 0,  density: 0.0 },
+            beach:      { minFloors: 1,  maxFloors: 3,  density: 0.3 }
+        };
+        
+        const config = configs[theme] || configs.residential;
+        const quarteiraoWidth = 39; // metros (calculado do terreno)
+        const numBuildings = Math.floor(config.density * 8);
+        
+        for (let i = 0; i < numBuildings; i++) {
+            const floors = config.minFloors + Math.floor(rand() * (config.maxFloors - config.minFloors + 1));
+            if (floors <= 0) continue;
+            
+            const height = floors * 3; // 3m por andar
+            const width = 5 + rand() * 15;
+            const depth = 5 + rand() * 12;
+            
+            // Posição dentro do quarteirão
+            const localX = -quarteiraoWidth/2 + rand() * quarteiraoWidth;
+            const localZ = -quarteiraoWidth + rand() * quarteiraoWidth * 2;
+            
+            // Textura de fachada (30 variações)
+            const facadeVariant = Math.floor(rand() * 30);
+            const texture = this.textureManager.getBuildingTexture(facadeVariant);
+            
+            // Criar mesh do prédio
+            const geometry = new THREE.BoxGeometry(width, height, depth);
+            const material = new THREE.MeshStandardMaterial({
+                map: texture,
+                roughness: 0.6,
+                metalness: 0.1
+            });
+            
+            const building = new THREE.Mesh(geometry, material);
+            building.position.set(localX, height / 2, localZ);
+            building.castShadow = true;
+            building.receiveShadow = true;
+            building.userData = { type: 'building', width, height, depth, theme };
+            
+            buildings.push(building);
+        }
+        
+        return buildings;
+    }
+    
+    seededRandom(seed) {
+        let s = seed;
+        return function() {
+            s = (s * 16807 + 0) % 2147483647;
+            return (s - 1) / 2147483646;
+        };
+    }
+}
+
+
+==================================================================================================
+                   PARTE 6: A IA DEVE BAIXAR TODOS OS ASSETS AUTOMATICAMENTE
+==================================================================================================
+
+⚠️ IMPORTANTE: A IA NÃO PODE simplesmente criar pastas vazias.
+   Ela DEVE preencher as pastas com assets REAIS baixados da internet
+   OU gerados proceduralmente se o download falhar.
+
+6.1. LISTA DE TEXTURAS QUE A IA DEVE BAIXAR
+--------------------------------------------------------------------------------------------------
+
+ASFALTO (10 variações):
+  Fontes: Poly Haven, AmbientCG, Textures.com
+  Termos de busca: "asphalt texture seamless CC0", "road texture free"
+  Nomes: asphalt_01.webp, asphalt_02.webp, ..., asphalt_10.webp
+  Resolução: 1024×1024 ou maior
+
+CALÇADA (10 variações):
+  Fontes: Poly Haven, AmbientCG
+  Termos de busca: "sidewalk texture seamless", "concrete pavement texture"
+  Nomes: sidewalk_01.webp, ..., sidewalk_10.webp
+
+GRAMA (8 variações):
+  Fontes: Poly Haven, AmbientCG
+  Termos de busca: "grass texture seamless CC0", "lawn texture free"
+  Nomes: grass_01.webp, ..., grass_08.webp
+
+FACHADAS (30 variações):
+  Fontes: Textures.com, Poly Haven
+  Termos de busca: "brick wall texture seamless", "building facade texture",
+                  "glass building texture", "painted wall texture"
+  Nomes: building_01.webp, ..., building_30.webp
+
+TELHADOS (10 variações):
+  Fontes: Poly Haven, AmbientCG
+  Termos de busca: "roof texture seamless", "roof tiles texture"
+  Nomes: roof_01.webp, ..., roof_10.webp
+
+TERRA (5 variações):
+  Fontes: Poly Haven, AmbientCG
+  Termos de busca: "dirt ground texture seamless", "soil texture CC0"
+  Nomes: terrain_01.webp, ..., terrain_05.webp
+
+6.2. LISTA DE ÁUDIOS QUE A IA DEVE BAIXAR
+--------------------------------------------------------------------------------------------------
+
+PASSOS:
+  Fontes: Freesound, Pixabay, Zapsplat
+  Termos: "footsteps asphalt", "footsteps concrete", "footsteps grass"
+  Arquivos: footstep_asphalt_01.mp3, footstep_concrete_01.mp3, footstep_grass_01.mp3
+
+RESPIRAÇÃO:
+  Fontes: Freesound, Pixabay
+  Termos: "heavy breathing running", "panting breath"
+  Arquivos: breathing_normal.mp3, breathing_heavy.mp3, breathing_exhausted.mp3
+
+AMBIENTE:
+  Fontes: Freesound, Pixabay
+  Termos: "city ambient", "birds park", "wind blowing", "traffic distant"
+  Arquivos: ambient_city.mp3, ambient_park.mp3, ambient_beach.mp3, ambient_night.mp3
+
+CONQUISTAS:
+  Fontes: Pixabay, Zapsplat
+  Termos: "achievement sound", "fanfare", "fireworks sound"
+  Arquivos: milestone_fanfare.mp3, milestone_fireworks.mp3
+
+UI:
+  Fontes: Pixabay, Zapsplat
+  Termos: "button click", "game over sound"
+  Arquivos: ui_click.mp3, ui_gameover.mp3
+
+6.3. PLANO B: GERAÇÃO PROCEDURAL DE TEXTURAS
+--------------------------------------------------------------------------------------------------
+
+Se a IA não conseguir baixar texturas da internet, ela DEVE gerar texturas 
+usando Canvas 2D ou Python/Pillow com ruído procedural.
+
+SCRIPT DE GERAÇÃO DE TEXTURAS (create_texture_variations.py):
+
+from PIL import Image, ImageDraw
+import random
+import math
+
+def generate_asphalt(variant, size=1024):
+    """Gera textura de asfalto procedural"""
+    img = Image.new('RGB', (size, size), (55, 55, 57))
+    draw = ImageDraw.Draw(img)
+    
+    # Granulação base
+    for i in range(size * size // 4):
+        x = random.randint(0, size-1)
+        y = random.randint(0, size-1)
+        v = random.randint(40, 70)
+        img.putpixel((x, y), (v, v, v+2))
+    
+    # Rachaduras
+    for _ in range(3 + variant % 3):
+        x, y = random.randint(0, size), random.randint(0, size)
+        for _ in range(20):
+            nx = x + random.randint(-15, 15)
+            ny = y + random.randint(-15, 15)
+            if 0 <= nx < size and 0 <= ny < size:
+                draw.line([(x, y), (nx, ny)], fill=(30, 30, 30), width=1)
+            x, y = nx, ny
+    
+    return img
+
+# Gerar todas as variações
+for v in range(10):
+    img = generate_asphalt(v)
+    img.save(f'asphalt_0{v+1:02d}.webp', 'WEBP', quality=85)
+
+6.4. PLANO C: MODELOS 3D SIMPLES COM GEOMETRIAS
+--------------------------------------------------------------------------------------------------
+
+Se a IA não conseguir baixar modelos .glb, ela DEVE criar modelos usando 
+geometrias básicas do Three.js (código no próprio game.js):
+
+CRIAR ÁRVORE SIMPLES:
+function createSimpleTree(variant) {
+    const group = new THREE.Group();
+    
+    // Tronco (cilindro marrom)
+    const trunkGeo = new THREE.CylinderGeometry(0.15, 0.20, 2 + variant * 0.5, 8);
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5D4037, roughness: 0.9 });
+    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+    trunk.position.y = 1;
+    trunk.castShadow = true;
+    group.add(trunk);
+    
+    // Copa (esferas verdes sobrepostas)
+    const crownColors = [0x2E7D32, 0x388E3C, 0x43A047, 0x4CAF50, 0x1B5E20];
+    const crownMat = new THREE.MeshStandardMaterial({ 
+        color: crownColors[variant % crownColors.length], 
+        roughness: 0.8 
+    });
+    
+    for (let i = 0; i < 3; i++) {
+        const radius = 0.8 + variant * 0.15;
+        const crownGeo = new THREE.SphereGeometry(radius, 8, 6);
+        const crown = new THREE.Mesh(crownGeo, crownMat);
+        crown.position.set(
+            (Math.random() - 0.5) * 1.2,
+            2.5 + i * 0.6,
+            (Math.random() - 0.5) * 1.2
+        );
+        crown.castShadow = true;
+        group.add(crown);
+    }
+    
+    return group;
+}
+
+CRIAR POSTE DE LUZ:
+function createLamppost() {
+    const group = new THREE.Group();
+    
+    // Poste
+    const poleGeo = new THREE.CylinderGeometry(0.06, 0.1, 5, 8);
+    const poleMat = new THREE.MeshStandardMaterial({ 
+        color: 0x333333, 
+        roughness: 0.3, 
+        metalness: 0.9 
+    });
+    const pole = new THREE.Mesh(poleGeo, poleMat);
+    pole.position.y = 2.5;
+    pole.castShadow = true;
+    group.add(pole);
+    
+    // Braço horizontal
+    const armGeo = new THREE.BoxGeometry(1.5, 0.08, 0.08);
+    const arm = new THREE.Mesh(armGeo, poleMat);
+    arm.position.set(0.7, 4.8, 0);
+    group.add(arm);
+    
+    // Lâmpada
+    const bulbGeo = new THREE.SphereGeometry(0.2, 8, 4);
+    const bulbMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffffee,
+        emissive: 0x444422,
+        roughness: 0.2
+    });
+    const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+    bulb.position.set(1.5, 4.8, 0);
+    group.add(bulb);
+    
+    return group;
+}
+
+CRIAR BANCO DE PRAÇA:
+function createBench() {
+    const group = new THREE.Group();
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x6D4C41, roughness: 0.7 });
+    const metalMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.3, metalness: 0.9 });
+    
+    // Pernas metálicas
+    for (let side = -1; side <= 1; side += 2) {
+        const legGeo = new THREE.BoxGeometry(0.04, 0.6, 0.04);
+        const leg = new THREE.Mesh(legGeo, metalMat);
+        leg.position.set(side * 0.7, 0.3, 0);
+        group.add(leg);
+    }
+    
+    // Assento de madeira
+    const seatGeo = new THREE.BoxGeometry(1.6, 0.06, 0.35);
+    const seat = new THREE.Mesh(seatGeo, woodMat);
+    seat.position.y = 0.63;
+    group.add(seat);
+    
+    // Encosto
+    const backGeo = new THREE.BoxGeometry(1.6, 0.4, 0.04);
+    const back = new THREE.Mesh(backGeo, woodMat);
+    back.position.set(0, 0.83, -0.16);
+    group.add(back);
+    
+    return group;
+}
+
+
+==================================================================================================
+                         PARTE 7: DEPLOY NO GITHUB PAGES
+==================================================================================================
+
+7.1. CONFIGURAÇÃO DO REPOSITÓRIO
+--------------------------------------------------------------------------------------------------
+
+  1. Criar repositório no GitHub chamado "InfiniteRunnerWorldTour"
+  2. O arquivo index.html DEVE estar na RAIZ do repositório
+  3. Não usar subpastas para o entry point
+
+7.2. ATIVAR GITHUB PAGES
+--------------------------------------------------------------------------------------------------
+
+  1. Ir em Settings → Pages
+  2. Source: "Deploy from a branch"
+  3. Branch: "main" (ou "master")
+  4. Folder: "/ (root)"
+  5. Clicar "Save"
+  6. Aguardar 1-2 minutos
+  7. O site estará em: https://SEU_USERNAME.github.io/InfiniteRunnerWorldTour/
+
+7.3. VERIFICAÇÃO DE FUNCIONAMENTO
+--------------------------------------------------------------------------------------------------
+
+  1. Acessar a URL do GitHub Pages
+  2. Verificar se o jogo carrega (loading screen aparece)
+  3. Verificar se o menu principal aparece
+  4. Testar o botão "COMEÇAR CORRIDA"
+  5. Verificar se o ranking carrega do Firebase
+  6. Abrir o console do navegador (F12) e verificar se NÃO há erros
+
+
+==================================================================================================
+                         PARTE 8: LISTA DE VERIFICAÇÃO FINAL
+           (TUDO QUE A IA NÃO PODE DEIXAR DE COLOCAR - CHECKLIST COMPLETO)
+==================================================================================================
+
+A IA DESENVOLVEDORA DEVE MARCAR CADA ITEM ABAIXO COMO CONCLUÍDO:
+
+□ 1. TERRENO (Parte 2)
+    □ 1.1 Blocos de 100m × 100m com 20×20 segmentos
+    □ 1.2 Ruas com 10m de largura (planas, altura 0)
+    □ 1.3 Calçadas com 3m de largura (15cm de altura)
+    □ 1.4 Quarteirões (~39m cada lado, 30cm de altura)
+    □ 1.5 Altura variável com Perlin Noise nos quarteirões
+    □ 1.6 Meio-fio entre rua e calçada (20cm largura, 10cm altura)
+    □ 1.7 Blend Map para texturização (4 canais: R=asfalto, G=calçada, B=grama, A=terra)
+    □ 1.8 Shader de blend em terrainBlend.glsl funcionando
+    □ 1.9 Texturas diferentes para cada bloco (sem repetição)
+    □ 1.10 Marcações na rua (faixa central amarela tracejada)
+    □ 1.11 Geração procedural com pooling (remove blocos distantes)
+    □ 1.12 Transições suaves entre zonas (sem degraus bruscos)
+
+□ 2. MOVIMENTAÇÃO EM PRIMEIRA PESSOA
+    □ 2.1 Câmera na altura de 1,70m
+    □ 2.2 Velocidade base: 8 km/h (2,222 m/s)
+    □ 2.3 Sprint: 12 km/h (3,333 m/s)
+    □ 2.4 Teclas: W=correr, A/D=desviar, Shift=sprint, Espaço=pular
+    □ 2.5 Headbob sincronizado com a velocidade (seno/cosseno)
+    □ 2.6 Colisões com prédios, postes e árvores
+    □ 2.7 Sistema de stamina (consome no sprint, regenera parado)
+    □ 2.8 Sistema de fadiga: -5% velocidade a cada 10min após 30min
+    □ 2.9 Pulo com gravidade realista (9.8 m/s²)
+    □ 2.10 Dano visual (tela vermelha) ao colidir
+
+□ 3. DISTÂNCIA E TEMPO REALISTAS
+    □ 3.1 Cronômetro contínuo usando performance.now()
+    □ 3.2 Distância calculada: velocidade(m/s) × tempo(segundos)
+    □ 3.3 1km no jogo leva 7min30s (corrida) ou 5min (sprint)
+    □ 3.4 HUD mostra "Distância: X.XX km"
+    □ 3.5 HUD mostra "Tempo: HH:MM:SS"
+    □ 3.6 Ritmo médio (min/km) atualizado
+    □ 3.7 Tempo e distância são salvos no resultado final
+
+□ 4. MARCOS EXPONENCIAIS
+    □ 4.1 Marcos: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 km
+    □ 4.2 Cada marco dobra o valor do anterior
+    □ 4.3 Animação de conquista ao atingir marco (tela cheia)
+    □ 4.4 Efeito de partículas + som de fanfarra
+    □ 4.5 Próximo marco sempre visível no HUD
+    □ 4.6 Marcos continuam dobrando infinitamente após 1024
+
+□ 5. RANKING GLOBAL POR IP
+    □ 5.1 Firebase Realtime Database configurado
+    □ 5.2 Regras de segurança: leitura e escrita pública
+    □ 5.3 Obter IP via api.ipify.org automaticamente
+    □ 5.4 Enviar pontuação ao final da partida (automático)
+    □ 5.5 Buscar top 100 do ranking
+    □ 5.6 Exibir tabela: Posição, IP (mascarado), Distância, Marcos, Tempo, Data
+    □ 5.7 Atualizar ranking automaticamente a cada 15 segundos
+    □ 5.8 Destacar linha do jogador na tabela
+    □ 5.9 Mostrar posição do jogador no ranking
+    □ 5.10 Medalhas para top 3 (🥇🥈🥉)
+    □ 5.11 NÃO requer login, cadastro ou senha
+
+□ 6. TEXTURAS E ASSETS
+    □ 6.1 Mínimo 50 texturas baixadas ou geradas
+    □ 6.2 10 variações de asfalto
+    □ 6.3 10 variações de calçada
+    □ 6.4 8 variações de grama
+    □ 6.5 30 variações de fachada de prédio
+    □ 6.6 10 variações de telhado
+    □ 6.7 5 variações de terra
+    □ 6.8 Modelos de árvores (10 variações ou geradas proceduralmente)
+    □ 6.9 Modelos de mobiliário urbano (banco, lixeira, poste, semáforo)
+    □ 6.10 Áudios: passos, respiração, ambiente, conquistas, UI
+    □ 6.11 Todas as texturas em formato .webp
+    □ 6.12 Texturas com resolução 1024×1024+
+
+□ 7. CICLO DIA/NOITE
+    □ 7.1 Ciclo de 24 minutos (1min = 1h do dia)
+    □ 7.2 Iluminação dinâmica (sol/lua)
+    □ 7.3 Postes acendem automaticamente à noite
+    □ 7.4 Céu com estrelas e nuvens
+    □ 7.5 Sombras em tempo real
+    □ 7.6 Neblina urbana (fog shader)
+
+□ 8. INTERFACE (HUD)
+    □ 8.1 Distância (km) - canto superior esquerdo
+    □ 8.2 Tempo (HH:MM:SS) - canto superior esquerdo
+    □ 8.3 Próximo marco - canto superior direito
+    □ 8.4 Ritmo (min/km) - canto superior direito
+    □ 8.5 Barra de stamina - centro inferior
+    □ 8.6 Indicador de sprint
+    □ 8.7 Menu principal: "COMEÇAR CORRIDA", "RANKING GLOBAL", "CONFIGURAÇÕES"
+    □ 8.8 Tela de Game Over com estatísticas completas
+    □ 8.9 Modal de ranking com tabela
+    □ 8.10 Tela de pausa (ESC)
+    □ 8.11 Tela de loading com barra de progresso
+
+□ 9. PERSISTÊNCIA
+    □ 9.1 Recorde pessoal salvo em localStorage
+    □ 9.2 Configurações salvas em localStorage
+    □ 9.3 Ranking global salvo no Firebase
+    □ 9.4 Tudo automático (sem botão "salvar")
+
+□ 10. GITHUB PAGES
+    □ 10.1 index.html na raiz do repositório
+    □ 10.2 Estrutura de pastas correta
+    □ 10.3 GitHub Pages ativado
+    □ 10.4 Jogo acessível via URL pública
+    □ 10.5 Sem erros no console (F12)
+    □ 10.6 Carrega em Chrome, Firefox, Edge, Safari
+
+□ 11. DOCUMENTAÇÃO
+    □ 11.1 README.md completo
+    □ 11.2 CREDITS.txt com fontes
+    □ 11.3 LICENSE (MagnorioBR - todos os direitos)
+    □ 11.4 Código comentado em português
+
+□ 12. ARQUIVO .ZIP FINAL
+    □ 12.1 Nome: InfiniteRunnerWorldTour_MagnorioBR_v4.0.zip
+    □ 12.2 Contém todos os arquivos
+    □ 12.3 Estrutura de pastas mantida
+    □ 12.4 Pronto para descompactar e fazer upload
+
+
+==================================================================================================
+                        PARTE 9: SEQUÊNCIA DE EXECUÇÃO PARA A IA
+==================================================================================================
+
+A IA DEVE SEGUIR ESTA ORDEM EXATA:
+
+PASSO 1: Criar a estrutura de pastas (Parte 1)
+PASSO 2: Configurar Firebase e criar firebase-config.js
+PASSO 3: Baixar ou gerar TODAS as texturas (Parte 6)
+PASSO 4: Baixar ou gerar TODOS os áudios (Parte 6)
+PASSO 5: Criar os modelos 3D (ou baixar .glb, ou gerar com geometrias)
+PASSO 6: Criar terrain-generator.js com o terreno completo (Parte 2)
+PASSO 7: Criar os shaders (terrainBlend.glsl, water.glsl, fog.glsl)
+PASSO 8: Criar game.js com:
+         - Sistema de texturas (TextureManager)
+         - Geração de blocos de cidade (WorldGenerator)
+         - Jogador em primeira pessoa (PlayerController)
+         - Sistema de tempo/distância realista (ScoreSystem)
+         - Ciclo dia/noite (DayNightCycle)
+         - Partículas (ParticleSystem)
+         - Áudio (AudioManager)
+PASSO 9: Criar ranking.js com funções do Firebase (Parte 3)
+PASSO 10: Criar index.html com toda a UI (Parte 7)
+PASSO 11: Criar style.css com todos os estilos
+PASSO 12: Criar ferramentas Python (Tools/)
+PASSO 13: Criar documentação (README.md, CREDITS.txt, LICENSE)
+PASSO 14: Testar TUDO no navegador
+PASSO 15: Verificar checklist (Parte 8)
+PASSO 16: Criar .zip final
+PASSO 17: Fazer upload para GitHub e ativar GitHub Pages
+
+
+==================================================================================================
+                          PARTE 10: REGRAS ABSOLUTAS
+==================================================================================================
+
+1.  A distância DEVE ser baseada na vida real (1km = 1km, tempo real).
+2.  O ranking DEVE ser salvo automaticamente por IP, sem cadastro.
+3.  As texturas NUNCA podem se repetir no mesmo bloco.
+4.  O jogo DEVE rodar sem erros no console do navegador.
+5.  Tudo deve estar pronto para GitHub Pages (apenas arquivos estáticos).
+6.  O ranking DEVE atualizar automaticamente (polling a cada 15s).
+7.  O jogador NÃO precisa fazer login ou criar conta.
+8.  O terreno DEVE ter altura variável e blend de texturas.
+9.  O jogo DEVE ter pelo menos 50 texturas (baixadas ou geradas).
+10. Todos os direitos são de MagnorioBR.
+11. O jogo DEVE ter áudio (passos, respiração, ambiente, conquistas).
+12. O ciclo dia/noite DEVE funcionar com iluminação dinâmica.
+13. O jogo DEVE mostrar o ranking em tabela formatada.
+14. O HUD DEVE mostrar distância, tempo, ritmo e próximo marco.
+
+
+==================================================================================================
+                         OBSERVAÇÕES FINAIS
+==================================================================================================
+
+Este projeto quando completo terá aproximadamente:
+  - 3000+ linhas de código JavaScript
+  - 500+ linhas de CSS
+  - 200+ linhas de shaders GLSL
+  - 50+ texturas .webp
+  - 20+ arquivos de áudio .mp3
+  - 10+ modelos 3D
+
+O resultado final será um jogo AAA indie, totalmente jogável,
+com ranking global automático e distância/tempo realistas.
+
+CONTATO:
+  Email: Magnoriobr@gmail.com
+
+==================================================================================================
+  FIM DAS INSTRUÇÕES - VERSÃO 4.0 DEFINITIVA
+  (c) 2026 MagnorioBR - TODOS OS DIREITOS RESERVADOS
+==================================================================================================

@@ -1,0 +1,1 @@
+{"version":"4.0","author":"MagnorioBR","block_size":100,"road_width":10,"sidewalk_width":3,"building_min_h":8,"building_max_h":40,"themes":["urban","residential","commercial","park","beach"],"milestones":[1,2,4,8,16,32,64,128,256,512,1024],"speed_base":2.222,"speed_sprint":3.333,"stamina_max":100}

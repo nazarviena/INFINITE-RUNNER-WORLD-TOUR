@@ -1,0 +1,74 @@
+{
+  "version": "2.0",
+  "author": "MagnorioBR",
+  "email": "Magnoriobr@gmail.com",
+  "copyright": "2026 MagnorioBR - All Rights Reserved",
+  
+  "world": {
+    "block_size": 100,
+    "road_width": 10,
+    "sidewalk_width": 3,
+    "building_min_height": 8,
+    "building_max_height": 40,
+    "view_distance": 400,
+    "themes": ["urban", "residential", "commercial", "park", "mixed"]
+  },
+  
+  "player": {
+    "camera_height": 1.70,
+    "base_speed_ms": 8,
+    "sprint_speed_ms": 14,
+    "max_stamina": 100,
+    "stamina_drain_per_second": 25,
+    "stamina_regen_per_second": 15,
+    "lateral_speed": 3,
+    "jump_force": 5,
+    "gravity": 9.8,
+    "headbob_amplitude": 0.04,
+    "headbob_frequency": 2.5
+  },
+  
+  "scoring": {
+    "type": "exponential",
+    "initial_milestone_km": 1,
+    "multiplier": 2,
+    "milestones": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+  },
+  
+  "day_night": {
+    "enabled": true,
+    "km_per_hour": 5,
+    "start_hour": 8,
+    "sunrise_color": [1.0, 0.7, 0.4],
+    "day_color": [0.53, 0.81, 0.98],
+    "sunset_color": [1.0, 0.5, 0.3],
+    "night_color": [0.02, 0.02, 0.08]
+  },
+  
+  "graphics": {
+    "resolution": "auto",
+    "antialias": true,
+    "shadows": true,
+    "shadow_map_size": 2048,
+    "texture_quality": "high",
+    "max_texture_size": 2048,
+    "fog_enabled": true,
+    "bloom_enabled": true
+  },
+  
+  "audio": {
+    "master_volume": 0.8,
+    "music_volume": 0.6,
+    "sfx_volume": 0.9,
+    "footstep_interval_base": 0.5,
+    "breathing_fade_km": 10
+  },
+  
+  "performance": {
+    "target_fps": 60,
+    "max_draw_distance": 400,
+    "instance_threshold": 20,
+    "pool_size": 30,
+    "lod_distances": [100, 250, 400]
+  }
+}

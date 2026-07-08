@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Infinite Runner: World Tour - MagnorioBR</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="loading-screen"><div class="load-inner">
+<h1 class="glow-text">INFINITE RUNNER</h1><h2>WORLD TOUR</h2>
+<div class="load-bar-bg"><div class="load-bar-fill" id="load-bar"></div></div>
+<p id="load-msg">Iniciando...</p><span class="load-author">MagnorioBR</span>
+</div></div>
+
+<div id="main-menu" style="display:none"><div class="menu-box">
+<h1 class="glow-text">INFINITE RUNNER</h1><h2>WORLD TOUR</h2>
+<div class="menu-btns">
+<button id="btn-start" class="btn-glow">COMEÇAR CORRIDA</button>
+<button id="btn-ranking" class="btn-glow">RANKING GLOBAL</button>
+<button id="btn-settings" class="btn-glow">CONFIGURAÇÕES</button>
+</div>
+<p class="menu-hint">W=Correr | A/D=Desviar | Shift=Sprint | Espaço=Pular</p>
+<div class="menu-record">Recorde: <span id="menu-best">0.00 km</span></div>
+</div></div>
+
+<div id="ranking-modal" style="display:none"><div class="modal-box">
+<h2>RANKING GLOBAL</h2>
+<div class="rank-scroll"><table class="rank-table"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th><th>Tempo</th></tr></thead><tbody id="rank-body"></tbody></table></div>
+<p id="rank-pos"></p><button class="btn-glow btn-close-rank">FECHAR</button>
+</div></div>
+
+<div id="settings-modal" style="display:none"><div class="modal-box">
+<h2>CONFIGURAÇÕES</h2>
+<div class="set-row"><label>Música</label><input type="range" id="vol-music" min="0" max="100" value="50"></div>
+<div class="set-row"><label>Efeitos</label><input type="range" id="vol-sfx" min="0" max="100" value="80"></div>
+<div class="set-row"><label>Clima</label><select id="weather-mode"><option value="auto">Automático</option><option value="clear">Limpo</option><option value="rain">Chuva</option></select></div>
+<button class="btn-glow btn-close-settings">FECHAR</button>
+</div></div>
+
+<div id="game-hud" style="display:none">
+<div class="hud-tl">
+<div class="hud-box"><span class="hl">DISTÂNCIA</span><span class="hv" id="hd">0.00 km</span></div>
+<div class="hud-box"><span class="hl">TEMPO</span><span class="hv" id="ht">00:00</span></div>
+<div class="hud-box"><span class="hl">RITMO</span><span class="hv" id="hp">--:--/km</span></div>
+</div>
+<div class="hud-tr">
+<div class="hud-box"><span class="hl">PRÓXIMO MARCO</span><span class="hv" id="hm">1 km</span></div>
+<div class="hud-box"><span class="hl">VELOCIDADE</span><span class="hv" id="hs">0 km/h</span></div>
+<div class="hud-box"><span class="hl">RECORDE</span><span class="hv" id="hr">0 km</span></div>
+</div>
+<div class="hud-bc"><div class="stam-bg"><div class="stam-fill" id="stam-fill"></div></div><span class="stam-label">STAMINA</span></div>
+<div class="hud-weather" id="hw"></div>
+</div>
+
+<div id="milestone-ov" style="display:none"><div class="ms-content"><h2>MARCO ATINGIDO!</h2><div class="ms-km" id="ms-km">1 km</div></div></div>
+
+<div id="pause-sc" style="display:none"><div class="menu-box"><h2>PAUSADO</h2>
+<button class="btn-glow" id="btn-resume">CONTINUAR</button>
+<button class="btn-glow" id="btn-restart">REINICIAR</button>
+<button class="btn-glow" id="btn-quit">MENU</button>
+</div></div>
+
+<div id="gameover-sc" style="display:none"><div class="menu-box go-box">
+<h2 class="go-title">GAME OVER</h2>
+<div class="go-stats"><p>Distância: <b id="go-dist">0 km</b></p><p>Tempo: <b id="go-time">00:00</b></p><p>Marco: <b id="go-ms">-</b></p><p>Velocidade: <b id="go-spd">0 km/h</b></p></div>
+<p id="go-msg"></p>
+<button class="btn-glow" id="btn-retry">TENTAR NOVAMENTE</button>
+<button class="btn-glow" id="btn-go-menu">MENU</button>
+</div></div>
+
+<div id="game-container"></div>
+<div id="mobile-controls" style="display:none">
+<button id="mb-left" class="mb-btn">◀</button>
+<button id="mb-right" class="mb-btn">▶</button>
+<button id="mb-jump" class="mb-btn mb-big">PULAR</button>
+<button id="mb-sprint" class="mb-btn mb-big">SPRINT</button>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.152.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.152.0/examples/jsm/"}}
+</script>
+<script type="module" src="game.js"></script>
+</body>
+</html>

@@ -1,21 +1,59 @@
-MIT License
+================================================================================
+                    INFINITE RUNNER: WORLD TOUR - v2.0
+================================================================================
 
-Copyright (c) 2026 Equipe_Zoom_Lucro
+Copyright (c) 2026 MagnorioBR
+Todos os direitos reservados.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+PROPRIETÁRIO: MagnorioBR
+EMAIL: Magnoriobr@gmail.com
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+================================================================================
+                        TERMOS DE LICENÇA
+================================================================================
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. PROPRIEDADE INTELECTUAL
+   Todo o conteúdo deste projeto, incluindo mas não limitado a:
+   - Código-fonte (JavaScript, Python, C#, GLSL)
+   - Design de jogo e mecânicas
+   - Assets gráficos (texturas, modelos 3D, shaders)
+   - Assets de áudio (efeitos sonoros, música)
+   - Documentação e arquivos de configuração
+   - Conceito e ideia original do jogo
+   
+   São de propriedade EXCLUSIVA de MagnorioBR.
+
+2. DIREITOS CONCEDIDOS
+   É permitido:
+   - Jogar o jogo para uso pessoal
+   - Estudar o código para fins educacionais pessoais
+   - Compilar builds para uso pessoal
+
+3. RESTRIÇÕES - NÃO É PERMITIDO:
+   - Redistribuir o jogo ou partes dele sem autorização
+   - Modificar e redistribuir versões modificadas
+   - Usar o código, arte ou assets em outros projetos
+   - Comercializar o jogo ou derivados
+   - Remover ou alterar créditos e atribuições
+   - Fazer engenharia reversa para criar jogos similares
+   - Usar o nome "Infinite Runner: World Tour" em outros projetos
+
+4. USO COMERCIAL
+   Qualquer uso comercial requer autorização expressa por escrito
+   do proprietário MagnorioBR.
+
+5. ATRIBUIÇÃO
+   Qualquer referência a este projeto deve creditar MagnorioBR
+   como autor e proprietário.
+
+6. DISCLAIMER
+   Este software é fornecido "como está", sem garantias de qualquer
+   tipo. O autor não se responsabiliza por danos decorrentes do uso.
+
+7. CONTATO PARA LICENCIAMENTO
+   Para solicitar permissões especiais ou licenciamento comercial:
+   Magnoriobr@gmail.com
+
+================================================================================
+        (c) 2026 MagnorioBR - TODOS OS DIREITOS RESERVADOS
+================================================================================
