@@ -16,7 +16,7 @@ function sR(s){let v=s;return()=>{v=(v*16807)%2147483647;return(v-1)/2147483646}
 // ═══════════════════════════════════════════════════════════════════
 const loader=new THREE.TextureLoader();
 const TEX={asphalt:[],sidewalk:[],grass:[],dirt:[],sand:[],building:[]};
-const TEX_BASE='assets/textures/';
+const TEX_BASE='WebBuild/assets/textures/';
 
 const TEX_FILES={
   asphalt:['asphalt/asphalt_01.webp','asphalt/asphalt_02.webp','asphalt/asphalt_03.webp','asphalt/asphalt_04.webp'],
