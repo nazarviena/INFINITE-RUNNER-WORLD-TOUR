@@ -2,84 +2,141 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Infinite Runner: World Tour - MagnorioBR</title>
-<link rel="stylesheet" href="style.css">
+<title>Infinite Runner: World Tour – MagnorioBR</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+canvas{display:block;position:fixed;top:0;left:0;z-index:1}
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#ui>*{pointer-events:auto}
+#loading{position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0d0d2b 0%,#020210 100%)}
+.load-c{text-align:center}
+.load-c h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.25em;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gl 2s ease-in-out infinite}
+.load-c h2{font-size:clamp(1rem,3vw,1.6rem);font-weight:300;letter-spacing:.4em;color:#bbb;margin:.5rem 0 2rem}
+@keyframes gl{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+.load-bar{width:min(360px,75vw);height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin:1rem auto;overflow:hidden}
+.load-bar div{height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#ff5e2c,#ffb833);transition:width .35s}
+#load-t{color:#888;font-size:.85rem;margin:.5rem 0}
+#load-a{color:#555;font-size:.7rem;margin-top:1.5rem;display:block}
+
+#menu,#rank,#conf,#pause,#go{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:50;background:rgba(0,0,0,.82);backdrop-filter:blur(6px)}
+.mb{text-align:center;padding:clamp(1rem,3vw,2.5rem) clamp(1.5rem,5vw,3rem);border:1.5px solid rgba(255,94,44,.3);border-radius:20px;background:rgba(8,8,25,.94);min-width:min(360px,90vw);max-width:95vw}
+.mb h2{font-size:clamp(1.3rem,4vw,2rem);margin-bottom:1.2rem;color:#ffb833;font-weight:700}
+.mb h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.2em;margin-bottom:.3rem;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mb h3{font-size:clamp(.9rem,2.5vw,1.3rem);font-weight:300;letter-spacing:.35em;color:#bbb;margin-bottom:1.8rem}
+.btns{display:flex;flex-direction:column;gap:.7rem;margin:1rem 0}
+.btn{padding:.65rem 1.4rem;font-size:clamp(.85rem,2.2vw,1.1rem);font-weight:600;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#ff5e2c,#c43818);color:#fff;transition:all .25s;letter-spacing:.05em;font-family:inherit}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(255,94,44,.4);background:linear-gradient(135deg,#ffb833,#ff5e2c)}
+.btn:active{transform:scale(.96)}
+.sm{font-size:clamp(.7rem,1.6vw,.8rem);color:#999;line-height:1.6;padding:.5rem;background:rgba(255,255,255,.03);border-radius:8px;margin:.8rem 0}
+.rec{color:#ffb833;font-size:.9rem;margin-top:.5rem}
+.ver{color:#555;font-size:.65rem;margin-top:.4rem;display:block}
+
+#hud{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;display:none}
+.hl{position:absolute;top:12px;left:12px}
+.hr{position:absolute;top:12px;right:12px;text-align:right}
+.hb{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);text-align:center}
+.hi{margin-bottom:.4rem}
+.hil{display:block;font-size:clamp(.45rem,1.3vw,.55rem);color:#777;letter-spacing:.12em;text-transform:uppercase}
+.hiv{display:block;font-size:clamp(.95rem,2.8vw,1.4rem);font-weight:700;color:#fff;text-shadow:0 0 10px rgba(255,94,44,.4)}
+.st-bg{width:min(220px,60vw);height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:0 auto 3px}
+.st-f{height:100%;width:100%;border-radius:2px;transition:width .2s,background .3s}
+.st-l{font-size:.55rem;color:#777;letter-spacing:.08em}
+#wi{position:absolute;bottom:20px;right:14px;font-size:1.3rem}
+#ms{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:35;pointer-events:none;background:rgba(0,0,0,.55)}
+.ms-i{text-align:center;animation:mi .6s ease-out}
+.ms-i h2{font-size:clamp(1.8rem,5vw,2.8rem);color:#ffb833;text-shadow:0 0 50px rgba(255,184,51,.7)}
+.ms-i .ms-v{font-size:clamp(3rem,8vw,5rem);font-weight:900;color:#fff;text-shadow:0 0 70px rgba(255,255,255,.8)}
+@keyframes mi{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
+
+.go-t{font-size:clamp(1.8rem,5vw,2.5rem)!important;color:#e04520!important;text-shadow:0 0 25px rgba(224,69,32,.5)}
+.go-s{text-align:left;margin:1rem 0;line-height:2;background:rgba(255,255,255,.025);padding:.7rem 1rem;border-radius:10px;font-size:clamp(.7rem,1.8vw,.85rem)}
+.go-s p{color:#ccc}.go-s b{color:#ffb833}
+
+.rt{width:100%;border-collapse:collapse;font-size:clamp(.6rem,1.6vw,.78rem);margin:.6rem 0}
+.rt th{background:rgba(255,94,44,.15);padding:.4rem .3rem;color:#ffb833;font-size:.7rem;position:sticky;top:0}
+.rt td{padding:.35rem .3rem;border-bottom:1px solid rgba(255,255,255,.05);color:#bbb}
+.rt .pr td{background:rgba(255,94,44,.12)!important;color:#fff!important;font-weight:700}
+.rs{max-height:40vh;overflow-y:auto;border-radius:8px;background:rgba(0,0,0,.2);margin:.5rem 0}
+#rp{color:#ffb833;font-size:.8rem;margin:.4rem 0}
+
+.sr{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.05);gap:.8rem}
+.sr label{color:#ccc;font-size:.85rem;white-space:nowrap}
+.sr input[type=range]{flex:1;max-width:140px;accent-color:#ff5e2c}
+.sr select{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:.25rem .4rem;font-family:inherit;font-size:.85rem}
+
+.dmg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,0,0,.22);z-index:25;pointer-events:none;animation:df .35s forwards}
+@keyframes df{0%{opacity:1}100%{opacity:0}}
+
+#mc{position:fixed;bottom:18px;left:0;width:100%;display:none;justify-content:center;gap:8px;z-index:30;padding:0 8px;flex-wrap:wrap}
+.mcb{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:1.1rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;user-select:none}
+.mcb:active{background:rgba(255,94,44,.45)}
+.mcbb{width:66px;height:66px;font-size:.7rem;font-weight:700}
+
+@media(min-width:1024px){#mc{display:none!important}}
+</style>
 </head>
 <body>
-<div id="loading-screen"><div class="load-inner">
-<h1 class="glow-text">INFINITE RUNNER</h1><h2>WORLD TOUR</h2>
-<div class="load-bar-bg"><div class="load-bar-fill" id="load-bar"></div></div>
-<p id="load-msg">Iniciando...</p><span class="load-author">MagnorioBR</span>
+
+<div id="loading"><div class="load-c">
+<h1>INFINITE RUNNER</h1><h2>WORLD TOUR</h2>
+<div class="load-bar"><div id="lbar"></div></div>
+<p id="load-t">Iniciando motor…</p><span id="load-a">MagnorioBR © 2026</span>
 </div></div>
 
-<div id="main-menu" style="display:none"><div class="menu-box">
-<h1 class="glow-text">INFINITE RUNNER</h1><h2>WORLD TOUR</h2>
-<div class="menu-btns">
-<button id="btn-start" class="btn-glow">COMEÇAR CORRIDA</button>
-<button id="btn-ranking" class="btn-glow">RANKING GLOBAL</button>
-<button id="btn-settings" class="btn-glow">CONFIGURAÇÕES</button>
-</div>
-<p class="menu-hint">W=Correr | A/D=Desviar | Shift=Sprint | Espaço=Pular</p>
-<div class="menu-record">Recorde: <span id="menu-best">0.00 km</span></div>
+<div id="menu"><div class="mb">
+<h1>INFINITE RUNNER</h1><h3>WORLD TOUR</h3>
+<div class="btns"><button class="btn" id="bs">🏃 COMEÇAR CORRIDA</button>
+<button class="btn" id="brk">🏆 RANKING</button>
+<button class="btn" id="bcf">⚙️ CONFIGURAÇÕES</button></div>
+<p class="sm">W=Correr · A/D=Desviar · Shift=Sprint · Espaço=Pular · ESC=Pausa</p>
+<p class="rec">🏅 Recorde: <span id="brec">0.00 km</span></p>
+<span class="ver">v4.0 · MagnorioBR</span>
 </div></div>
 
-<div id="ranking-modal" style="display:none"><div class="modal-box">
-<h2>RANKING GLOBAL</h2>
-<div class="rank-scroll"><table class="rank-table"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th><th>Tempo</th></tr></thead><tbody id="rank-body"></tbody></table></div>
-<p id="rank-pos"></p><button class="btn-glow btn-close-rank">FECHAR</button>
+<div id="rank"><div class="mb">
+<h2>🏆 RANKING GLOBAL</h2>
+<div class="rs"><table class="rt"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th><th>Tempo</th></tr></thead><tbody id="rb"></tbody></table></div>
+<p id="rp"></p><button class="btn" id="bcr">FECHAR</button>
 </div></div>
 
-<div id="settings-modal" style="display:none"><div class="modal-box">
-<h2>CONFIGURAÇÕES</h2>
-<div class="set-row"><label>Música</label><input type="range" id="vol-music" min="0" max="100" value="50"></div>
-<div class="set-row"><label>Efeitos</label><input type="range" id="vol-sfx" min="0" max="100" value="80"></div>
-<div class="set-row"><label>Clima</label><select id="weather-mode"><option value="auto">Automático</option><option value="clear">Limpo</option><option value="rain">Chuva</option></select></div>
-<button class="btn-glow btn-close-settings">FECHAR</button>
+<div id="conf"><div class="mb">
+<h2>⚙️ CONFIGURAÇÕES</h2>
+<div class="sr"><label>Música</label><input type="range" id="vm" min="0" max="100" value="50"></div>
+<div class="sr"><label>Efeitos</label><input type="range" id="ve" min="0" max="100" value="80"></div>
+<div class="sr"><label>Clima</label><select id="wm"><option value="auto">Automático</option><option value="clear">Limpo</option><option value="rain">Chuva</option></select></div>
+<button class="btn" id="bcc">FECHAR</button>
 </div></div>
 
-<div id="game-hud" style="display:none">
-<div class="hud-tl">
-<div class="hud-box"><span class="hl">DISTÂNCIA</span><span class="hv" id="hd">0.00 km</span></div>
-<div class="hud-box"><span class="hl">TEMPO</span><span class="hv" id="ht">00:00</span></div>
-<div class="hud-box"><span class="hl">RITMO</span><span class="hv" id="hp">--:--/km</span></div>
-</div>
-<div class="hud-tr">
-<div class="hud-box"><span class="hl">PRÓXIMO MARCO</span><span class="hv" id="hm">1 km</span></div>
-<div class="hud-box"><span class="hl">VELOCIDADE</span><span class="hv" id="hs">0 km/h</span></div>
-<div class="hud-box"><span class="hl">RECORDE</span><span class="hv" id="hr">0 km</span></div>
-</div>
-<div class="hud-bc"><div class="stam-bg"><div class="stam-fill" id="stam-fill"></div></div><span class="stam-label">STAMINA</span></div>
-<div class="hud-weather" id="hw"></div>
+<div id="hud">
+<div class="hl"><div class="hi"><span class="hil">DISTÂNCIA</span><span class="hiv" id="hd">0.00 km</span></div><div class="hi"><span class="hil">TEMPO</span><span class="hiv" id="ht">00:00</span></div><div class="hi"><span class="hil">RITMO</span><span class="hiv" id="hp">--:-- /km</span></div></div>
+<div class="hr"><div class="hi"><span class="hil">PRÓXIMO MARCO</span><span class="hiv" id="hn">1 km</span></div><div class="hi"><span class="hil">VELOCIDADE</span><span class="hiv" id="hs">0 km/h</span></div><div class="hi"><span class="hil">RECORDE</span><span class="hiv" id="hrc">0 km</span></div></div>
+<div class="hb"><div class="st-bg"><div class="st-f" id="sf"></div></div><span class="st-l">STAMINA</span></div>
+<div id="wi"></div>
 </div>
 
-<div id="milestone-ov" style="display:none"><div class="ms-content"><h2>MARCO ATINGIDO!</h2><div class="ms-km" id="ms-km">1 km</div></div></div>
+<div id="ms"><div class="ms-i"><h2>🏅 MARCO ATINGIDO!</h2><div class="ms-v" id="msv">1 km</div></div></div>
 
-<div id="pause-sc" style="display:none"><div class="menu-box"><h2>PAUSADO</h2>
-<button class="btn-glow" id="btn-resume">CONTINUAR</button>
-<button class="btn-glow" id="btn-restart">REINICIAR</button>
-<button class="btn-glow" id="btn-quit">MENU</button>
+<div id="pause"><div class="mb"><h2>⏸️ PAUSADO</h2><div class="btns"><button class="btn" id="bres">▶️ CONTINUAR</button><button class="btn" id="brst">🔄 REINICIAR</button><button class="btn" id="bqt">🏠 MENU</button></div></div></div>
+
+<div id="go"><div class="mb">
+<h2 class="go-t">💀 GAME OVER</h2>
+<div class="go-s"><p>Distância: <b id="gd">0 km</b></p><p>Tempo: <b id="gt">00:00</b></p><p>Maior Marco: <b id="gm">-</b></p><p>Velocidade Média: <b id="gs">0 km/h</b></p></div>
+<p id="gmsg" style="color:#ffb833;font-size:.8rem;margin:.5rem 0"></p>
+<div class="btns"><button class="btn" id="brtry">🔄 TENTAR NOVAMENTE</button><button class="btn" id="bgm">🏠 MENU</button></div>
 </div></div>
 
-<div id="gameover-sc" style="display:none"><div class="menu-box go-box">
-<h2 class="go-title">GAME OVER</h2>
-<div class="go-stats"><p>Distância: <b id="go-dist">0 km</b></p><p>Tempo: <b id="go-time">00:00</b></p><p>Marco: <b id="go-ms">-</b></p><p>Velocidade: <b id="go-spd">0 km/h</b></p></div>
-<p id="go-msg"></p>
-<button class="btn-glow" id="btn-retry">TENTAR NOVAMENTE</button>
-<button class="btn-glow" id="btn-go-menu">MENU</button>
-</div></div>
-
-<div id="game-container"></div>
-<div id="mobile-controls" style="display:none">
-<button id="mb-left" class="mb-btn">◀</button>
-<button id="mb-right" class="mb-btn">▶</button>
-<button id="mb-jump" class="mb-btn mb-big">PULAR</button>
-<button id="mb-sprint" class="mb-btn mb-big">SPRINT</button>
+<div id="mc">
+<button class="mcb" id="mcl">◀</button>
+<button class="mcb mcbb" id="mcj">PULAR</button>
+<button class="mcb mcbb" id="mcs">SPRINT</button>
+<button class="mcb" id="mcr">▶</button>
 </div>
 
 <script type="importmap">
-{"imports":{"three":"https://unpkg.com/three@0.152.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.152.0/examples/jsm/"}}
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
 </script>
 <script type="module" src="game.js"></script>
 </body>

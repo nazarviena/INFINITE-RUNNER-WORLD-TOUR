@@ -1,80 +1,14 @@
-================================================================================
-            INFINITE RUNNER: WORLD TOUR - v2.0 - CRÉDITOS
-================================================================================
+INFINITE RUNNER: WORLD TOUR - CRÉDITOS
 
-CRIADOR E PROPRIETÁRIO
----------------------
-MagnorioBR - Design, Programação, Direção Criativa
-Email: Magnoriobr@gmail.com
+CRIADOR: MagnorioBR (Magnoriobr@gmail.com)
 
-================================================================================
-                        CRÉDITOS DE TECNOLOGIAS
-================================================================================
+TECNOLOGIAS:
+- Three.js (https://threejs.org/) - MIT License
+- Web Audio API
+- Canvas 2D API
 
-MOTOR WEB
----------
-Three.js (r152+) - https://threejs.org/
-  Licença: MIT
-  Copyright (c) 2010-2023 Three.js Authors
+TEXTURAS: Geradas proceduralmente via Canvas 2D
+ÁUDIO: Sintetizado via Web Audio API (procedural)
+MODELOS 3D: Geometrias do Three.js
 
-MOTOR DESKTOP
--------------
-Unity 2022 LTS - https://unity.com/
-  Copyright (c) Unity Technologies
-
-FERRAMENTAS DE DESENVOLVIMENTO
-------------------------------
-Python 3.11+ - https://python.org/
-  Licença: Python Software Foundation License
-
-Pillow (PIL) - https://python-pillow.org/
-  Licença: Historical Permission Notice and Disclaimer (HPND)
-
-NumPy - https://numpy.org/
-  Licença: BSD-3-Clause
-
-================================================================================
-                  FONTES DE ASSETS RECOMENDADOS (CC0/LIVRE)
-================================================================================
-
-TEXTURAS
---------
-Poly Haven - https://polyhaven.com/textures
-  Licença: CC0 (Domínio Público)
-
-AmbientCG - https://ambientcg.com/
-  Licença: CC0 (Domínio Público)
-
-MODELOS 3D
-----------
-Poly Pizza - https://poly.pizza/
-  Licença: CC0
-
-Quaternius - https://quaternius.com/
-  Licença: CC0
-
-ÁUDIO
------
-Freesound - https://freesound.org/
-  Licença: CC0 / Creative Commons
-
-ZapSplat - https://zapsplat.com/
-  Licença: Gratuito com atribuição
-
-FERRAMENTAS DE TEXTURA
-----------------------
-Materialize - https://boundingboxsoftware.com/materialize/
-  Licença: Gratuito
-
-================================================================================
-
-NOTA: Todos os assets de terceiros utilizados neste projeto devem ser
-compatíveis com a licença do projeto e devidamente creditados. Assets
-CC0 são preferidos para máxima compatibilidade.
-
-Texturas e modelos gerados proceduralmente pelo script
-create_texture_variations.py são criações originais de MagnorioBR.
-
-================================================================================
-        (c) 2026 MagnorioBR - TODOS OS DIREITOS RESERVADOS
-================================================================================
+© 2026 MagnorioBR - Todos os direitos reservados

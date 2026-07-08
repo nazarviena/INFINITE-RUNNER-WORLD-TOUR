@@ -1,102 +1,63 @@
 # 🏃 Infinite Runner: World Tour v4.0
 
-**Autor:** MagnorioBR | **Email:** Magnoriobr@gmail.com
-**© 2026 Todos os direitos reservados**
+**Autor: MagnorioBR** | **Magnoriobr@gmail.com** | **© 2026**
 
 ---
 
-## 🎮 Sobre
+## 🚀 DEPLOY IMEDIATO NO GITHUB PAGES
 
-Corrida infinita em PRIMEIRA PESSOA por cidades turísticas com:
-- 🗺️ Geração procedural infinita
-- 🎨 Texturas realistas sem repetição
-- ⏱️ Distância e tempo baseados na VIDA REAL (1km = 1km)
-- 🏆 Sistema de marcos exponenciais (1→2→4→8→16... km)
-- 🌧️ Sistema de clima dinâmico (sol, chuva, chão molhado)
-- 🌅 Ciclo dia/noite com iluminação dinâmica
-- 🔊 Áudio procedural (passos, respiração, ambiente)
-- 📊 Ranking local automático
-- 📱 Responsivo (desktop e mobile)
-
----
-
-## 🚀 Como Jogar
-
-### GitHub Pages (recomendado)
-1. Faça upload deste repositório para o GitHub
-2. Ative GitHub Pages em Settings → Pages → branch `main` → `/ (root)`
-3. Acesse: `https://SEU_USER.github.io/InfiniteRunnerWorldTour/`
-
-### Localmente
 ```bash
-cd WebBuild/
-python3 -m http.server 8080
-# Abra http://localhost:8080
+# 1. Crie um repositório no GitHub
+# 2. Faça upload desta pasta INTEIRA (sem subpastas extra)
+# 3. Settings → Pages → branch "main" → pasta "/ (root)" → Save
+# 4. Pronto! Acesse: https://SEU_USER.github.io/REPO/
 ```
 
+**O index.html está na RAIZ** — o GitHub Pages abre direto.
+
 ---
 
-## 🎯 Controles
+## 🎮 CONTROLES
 
 | Ação | Desktop | Mobile |
 |------|---------|--------|
-| Correr | W | Toque na tela |
+| Correr | W | Toque |
 | Desviar | A / D | Botões ◀ ▶ |
-| Sprint | Shift | Botão SPRINT |
-| Pular | Espaço | Botão PULAR |
-| Pausa | ESC | - |
+| Sprint | Shift | SPRINT |
+| Pular | Espaço | PULAR |
+| Pausa | ESC | — |
 
 ---
 
-## 📊 Sistema de Pontuação
+## 🎯 CARACTERÍSTICAS
 
-Marcos dobram exponencialmente:
-
-| Marco | Distância | Tempo (corrida) |
-|-------|-----------|-----------------|
-| 🥉 1º | 1 km | ~7min30s |
-| 🥈 2º | 2 km | ~15min |
-| 🥇 3º | 4 km | ~30min |
-| 💎 4º | 8 km | ~1h |
-| ⭐ 5º | 16 km | ~2h |
-| 🌟 6º | 32 km | ~4h |
-| ... | ...do brando... | |
-
----
-
-## 🛠️ Tecnologias
-
-- **Three.js** r152+ (WebGL)
-- **Web Audio API** (áudio procedural)
-- **Canvas 2D** (texturas procedurais)
-- **100% estático** — HTML/CSS/JS puro
+- 🗺️ **Geração procedural infinita** — blocos de 100m × 100m
+- 🎨 **68 texturas únicas** geradas proceduralmente (sem repetição)
+- ⏱️ **Tempo real** — 8 km/h = 1km a cada 7min30s
+- 🏆 **Marcos exponenciais** — 1→2→4→8→16→32→64→128→256→512→1024 km
+- 🌧️ **Clima dinâmico** — sol, nuvens, chuva com partículas e chão molhado
+- 🌅 **Ciclo dia/noite** — iluminação, sombras, postes noturnos
+- 🔊 **Áudio procedural** — passos por superfície, respiração, conquistas
+- 🏗️ **Cidades detalhadas** — prédios, árvores, bancos, postes, lixeiras
+- 📊 **Ranking automático** — salvo no localStorage por IP
+- 📱 **100% responsivo** — desktop + mobile com controles touch
 
 ---
 
-## 📁 Estrutura
+## 📊 PONTUAÇÃO
 
-```
-/
-├── index.html          ← Página principal
-├── game.js             ← Motor do jogo (695 linhas)
-├── style.css           ← Estilos responsivos
-├── ranking.js          ← Sistema de ranking local
-├── firebase-config.js  ← Config Firebase (opcional)
-├── shaders/            ← Shaders GLSL
-├── config/             ← Parâmetros
-├── README.md           ← Este arquivo
-├── LICENSE             ← Direitos reservados
-└── CREDITS.txt         ← Créditos
-```
+| Marco | Distância | Tempo (~) |
+|-------|-----------|-----------|
+| 🥉 | 1 km | 7min30s |
+| 🥈 | 2 km | 15min |
+| 🥇 | 4 km | 30min |
+| 💎 | 8 km | 1h |
+| ⭐ | 16 km | 2h |
+| 🌟 | 32 km | 4h |
 
 ---
 
-## ⚖️ Licença
+## ⚖️ LICENÇA
 
-**Todos os direitos reservados - MagnorioBR © 2026**
-
+**Todos os direitos reservados — MagnorioBR © 2026**
 Não é permitida redistribuição ou uso comercial sem autorização.
-
----
-
-📧 **Magnoriobr@gmail.com**
