@@ -1,19 +1,6 @@
-// Ranking Local - salva pontuações no localStorage
-// Para ranking global, configurar firebase-config.js
-
-async function getPlayerIP(){ try{ const r=await fetch('https://api.ipify.org?format=json'); const d=await r.json(); return d.ip; }catch(e){ return 'local'; } }
-
-function maskIP(ip){ const p=ip.split('.'); return p.length===4?`${p[0]}.${p[1]}.***.***`:ip; }
-
-function getLocalRanking(){ return JSON.parse(localStorage.getItem('ir_localrank')||'[]'); }
-
-function saveLocalScore(ip,distKm,marcos,tempo){
-  const scores=getLocalRanking();
-  scores.push({ip,dist:parseFloat(distKm.toFixed(2)),ms:marcos,time:tempo,date:new Date().toISOString().slice(0,10)});
-  scores.sort((a,b)=>b.dist-a.dist);
-  const top=scores.slice(0,100);
-  localStorage.setItem('ir_localrank',JSON.stringify(top));
-  return top;
-}
-
-function formatDate(d){ if(!d)return''; const dt=new Date(d); return dt.toLocaleDateString('pt-BR'); }
+// Ranking Local - Infinite Runner World Tour - MagnorioBR
+function maskIp(ip){const p=ip.split('.');return p.length===4?p[0]+'.'+p[1]+'.***.***':ip}
+function getRanking(){try{return JSON.parse(localStorage.getItem('irrk')||'[]')}catch(e){return[]}}
+async function getPlayerIP(){try{const c=new AbortController();const id=setTimeout(()=>c.abort(),2e3);const r=await fetch('https://api.ipify.org?format=json',{signal:c.signal});clearTimeout(id);const d=await r.json();return d.ip}catch(e){return'local_'+Math.random().toString(36).slice(2,8)}}
+function saveScore(ip,distKm,marcos,tempo){const s=getRanking();s.push({ip,dist:parseFloat(distKm.toFixed(2)),ms:marcos,time:tempo,date:new Date().toISOString().slice(0,10)});s.sort((a,b)=>b.dist-a.dist);const t=s.slice(0,100);localStorage.setItem('irrk',JSON.stringify(t));return t}
+function renderRankingTable(ip,rbId,rpId){const s=getRanking(),rb=document.getElementById(rbId),rp=document.getElementById(rpId);let h='';s.forEach((v,i)=>{const pl=v.ip===ip;h+='<tr class="'+(pl?'pr':'')+'"><td>'+(i<3?['🥇','🥈','🥉'][i]:i+1+'º')+'</td><td>'+maskIp(v.ip)+'</td><td>'+v.dist.toFixed(2)+' km</td><td>'+(v.ms||0)+'</td></tr>'});if(!s.length)h='<tr><td colspan="4">Nenhum</td></tr>';if(rb)rb.innerHTML=h;const pi=s.findIndex(v=>v.ip===ip);if(rp)rp.textContent=pi>=0?'Sua posicao: '+(pi+1)+'º':'Jogue para aparecer!'}

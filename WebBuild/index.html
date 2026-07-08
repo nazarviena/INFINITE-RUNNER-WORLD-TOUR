@@ -1,151 +1,16 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Runner: World Tour - MagnorioBR</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="loading-screen">
-        <div class="loading-content">
-            <h1 class="game-title">INFINITE RUNNER</h1>
-            <h2 class="game-subtitle">WORLD TOUR</h2>
-            <div class="loading-bar-container">
-                <div class="loading-bar" id="loading-bar"></div>
-            </div>
-            <p id="loading-text">Carregando texturas...</p>
-            <p class="loading-author">por MagnorioBR</p>
-        </div>
-    </div>
-    <div id="main-menu" style="display:none;">
-        <div class="menu-content">
-            <h1 class="game-title">INFINITE RUNNER</h1>
-            <h2 class="game-subtitle">WORLD TOUR</h2>
-            <div class="menu-buttons">
-                <button id="btn-run" class="menu-btn">CORRER</button>
-                <button id="btn-records" class="menu-btn">RECORDES</button>
-                <button id="btn-settings" class="menu-btn">CONFIGURACOES</button>
-            </div>
-            <div class="menu-controls-hint">
-                <p><strong>Controles:</strong> W = Correr | A/D = Desviar | Shift = Sprint | Espaco = Pular | ESC = Pausa</p>
-            </div>
-            <p class="menu-version">v2.0 - MagnorioBR &copy; 2026</p>
-        </div>
-    </div>
-    <div id="records-screen" style="display:none;">
-        <div class="menu-content">
-            <h2>RECORDES</h2>
-            <div id="records-list">
-                <p>Melhor Distancia: <span id="best-distance">0 km</span></p>
-                <p>Maior Marco: <span id="best-milestone">0 km</span></p>
-                <p>Total Percorrido: <span id="total-distance">0 km</span></p>
-                <p>Partidas Jogadas: <span id="games-played">0</span></p>
-            </div>
-            <button id="btn-back-records" class="menu-btn">VOLTAR</button>
-        </div>
-    </div>
-    <div id="settings-screen" style="display:none;">
-        <div class="menu-content">
-            <h2>CONFIGURACOES</h2>
-            <div class="settings-options">
-                <div class="setting-row">
-                    <label>Volume Geral:</label>
-                    <input type="range" id="vol-master" min="0" max="100" value="80">
-                </div>
-                <div class="setting-row">
-                    <label>Volume Musica:</label>
-                    <input type="range" id="vol-music" min="0" max="100" value="60">
-                </div>
-                <div class="setting-row">
-                    <label>Volume Efeitos:</label>
-                    <input type="range" id="vol-sfx" min="0" max="100" value="90">
-                </div>
-                <div class="setting-row">
-                    <label>Qualidade Grafica:</label>
-                    <select id="graphics-quality">
-                        <option value="low">Baixa</option>
-                        <option value="medium" selected>Media</option>
-                        <option value="high">Alta</option>
-                    </select>
-                </div>
-                <div class="setting-row">
-                    <label>Distancia de Renderizacao:</label>
-                    <select id="render-distance">
-                        <option value="200">200m</option>
-                        <option value="400" selected>400m</option>
-                        <option value="600">600m</option>
-                    </select>
-                </div>
-            </div>
-            <button id="btn-back-settings" class="menu-btn">VOLTAR</button>
-        </div>
-    </div>
-    <div id="game-hud" style="display:none;">
-        <div class="hud-top-left">
-            <div class="hud-distance">
-                <span class="hud-label">DISTANCIA</span>
-                <span class="hud-value" id="hud-distance">0.00 km</span>
-            </div>
-            <div class="hud-next-milestone">
-                <span class="hud-label">PROXIMO MARCO</span>
-                <span class="hud-value" id="hud-next-milestone">1 km</span>
-            </div>
-        </div>
-        <div class="hud-top-right">
-            <div class="hud-record">
-                <span class="hud-label">RECORDE</span>
-                <span class="hud-value" id="hud-record">0 km</span>
-            </div>
-            <div class="hud-speed">
-                <span class="hud-label">VELOCIDADE</span>
-                <span class="hud-value" id="hud-speed">0 km/h</span>
-            </div>
-        </div>
-        <div class="hud-bottom-center">
-            <div class="stamina-bar-container">
-                <div class="stamina-bar" id="stamina-bar"></div>
-                <span class="stamina-text" id="stamina-text">STAMINA</span>
-            </div>
-        </div>
-    </div>
-    <div id="milestone-overlay" style="display:none;">
-        <div class="milestone-content">
-            <h2 class="milestone-title">MARCO ATINGIDO!</h2>
-            <p class="milestone-value" id="milestone-value">1 km</p>
-            <div id="milestone-particles"></div>
-        </div>
-    </div>
-    <div id="pause-screen" style="display:none;">
-        <div class="menu-content">
-            <h2>PAUSADO</h2>
-            <button id="btn-resume" class="menu-btn">CONTINUAR</button>
-            <button id="btn-restart" class="menu-btn">REINICIAR</button>
-            <button id="btn-quit" class="menu-btn">MENU</button>
-        </div>
-    </div>
-    <div id="gameover-screen" style="display:none;">
-        <div class="menu-content gameover-content">
-            <h2 class="gameover-title">GAME OVER</h2>
-            <div class="gameover-stats">
-                <p>Distancia: <span id="go-distance">0 km</span></p>
-                <p>Maior Marco: <span id="go-milestone">-</span></p>
-                <p>Marcos Conquistados: <span id="go-milestones-count">0</span></p>
-                <p>Velocidade Media: <span id="go-avg-speed">0 km/h</span></p>
-            </div>
-            <button id="btn-retry" class="menu-btn">TENTAR NOVAMENTE</button>
-            <button id="btn-go-menu" class="menu-btn">MENU</button>
-        </div>
-    </div>
-    <div id="game-container"></div>
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.152.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.152.0/examples/jsm/"
-        }
-    }
-    </script>
-    <script type="module" src="game.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><meta name="apple-mobile-web-app-capable" content="yes"><title>Infinite Runner World Tour - MagnorioBR</title><link rel="stylesheet" href="style.css">
+</head><body>
+<div id="loading"><div><h1>INFINITE RUNNER</h1><h2>WORLD TOUR</h2><div class="lbar"><div id="lbar"></div></div><p id="lt">Carregando texturas reais...</p><span id="la">MagnorioBR</span></div></div>
+<div id="menu" class="ov"><div class="box"><h1>INFINITE RUNNER</h1><h3>WORLD TOUR</h3><div class="btns"><button class="btn" id="bs">COMEÇAR CORRIDA</button><button class="btn" id="brk">RANKING</button></div><p class="sm" id="ctrl-hint"></p><p class="rec">Recorde: <span id="brec">0.00 km</span></p><span class="ver">v7.2 · MagnorioBR</span></div></div>
+<div id="rank" class="ov"><div class="box"><h2>RANKING</h2><div class="rs"><table class="rt"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th></tr></thead><tbody id="rb"></tbody></table></div><p id="rp"></p><button class="btn" id="bcr">FECHAR</button></div></div>
+<div id="lock-msg">Clique na tela para jogar</div><div id="crosshair"></div>
+<div id="hud"><div class="hl"><div class="hi"><span class="hil">DISTANCIA</span><span class="hiv" id="hd">0.00 km</span></div><div class="hi"><span class="hil">TEMPO</span><span class="hiv" id="ht">00:00</span></div><div class="hi"><span class="hil">RITMO</span><span class="hiv" id="hp">--:-- /km</span></div></div><div class="hr"><div class="hi"><span class="hil">PROXIMO MARCO</span><span class="hiv" id="hn">1 km</span></div><div class="hi"><span class="hil">VELOCIDADE</span><span class="hiv" id="hs">0 km/h</span></div><div class="hi"><span class="hil">RECORDE</span><span class="hiv" id="hrc">0 km</span></div></div><div class="hb"><div class="stb"><div class="stf" id="sf"></div></div><span class="stl">STAMINA</span></div><div id="biome"></div><div id="cl"></div></div>
+<div id="ms"><div class="msi"><h2>MARCO ATINGIDO!</h2><div class="msv" id="msv">1 km</div></div></div>
+<div id="pause" class="ov"><div class="box"><h2>PAUSADO</h2><div class="btns"><button class="btn" id="bres">CONTINUAR</button><button class="btn" id="brst">REINICIAR</button><button class="btn" id="bqt">MENU</button></div></div></div>
+<div id="go" class="ov"><div class="box"><h2 class="got">GAME OVER</h2><div class="gos"><p>Distancia: <b id="gd">0 km</b></p><p>Tempo: <b id="gt">00:00</b></p><p>Maior Marco: <b id="gm">-</b></p><p>Velocidade: <b id="gs">0 km/h</b></p></div><p id="gmsg" style="color:#ffb833;font-size:.75rem;margin:.5rem 0"></p><div class="btns"><button class="btn" id="brtry">TENTAR NOVAMENTE</button><button class="btn" id="bgm">MENU</button></div></div></div>
+<div id="mc"><button class="mcb" id="mcl">L</button><button class="mcb mcbb" id="mcj">PULO</button><button class="mcb mcbb" id="mcs">SPRINT</button><button class="mcb" id="mcr">R</button></div>
+<div id="game-container"></div>
+<script src="../textures_data.js"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module" src="game.js"></script>
+</body></html>
