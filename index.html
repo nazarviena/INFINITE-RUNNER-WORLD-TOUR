@@ -1,26 +1,267 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Infinite Runner World Tour - MagnorioBR</title><style>
-*{margin:0;padding:0;box-sizing:border-box}body{overflow:hidden;font-family:'Segoe UI',system-ui;background:#000;color:#fff;user-select:none;touch-action:none;position:fixed;width:100%;height:100%}canvas{display:block;position:fixed;top:0;left:0;z-index:1}
-#loading{position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0d0d2b,#020210)}#loading>div{text-align:center}#loading h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.2em;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gl 2s infinite}#loading h2{font-size:clamp(1rem,3vw,1.5rem);font-weight:300;letter-spacing:.35em;color:#bbb;margin:.5rem 0 1.5rem}@keyframes gl{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5)}}.lbar{width:min(340px,70vw);height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:1rem auto;overflow:hidden}.lbar div{height:100%;width:0;border-radius:2px;background:linear-gradient(90deg,#ff5e2c,#ffb833);transition:width .4s}#lt{color:#999;font-size:.8rem;margin:.5rem 0}#la{color:#555;font-size:.65rem;margin-top:1.5rem;display:block}
-.ov{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:50;background:rgba(0,0,0,.85);backdrop-filter:blur(8px)}.box{text-align:center;padding:clamp(1rem,3vw,2.5rem);border:1px solid rgba(255,94,44,.3);border-radius:18px;background:rgba(8,8,28,.95);min-width:min(320px,88vw);max-width:90vw}.box h2{font-size:clamp(1.3rem,4vw,2rem);margin-bottom:1rem;color:#ffb833}.box h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.15em;margin-bottom:.2rem;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.box h3{font-size:clamp(.9rem,2.5vw,1.3rem);font-weight:300;letter-spacing:.3em;color:#bbb;margin-bottom:1.5rem}.btns{display:flex;flex-direction:column;gap:.6rem;margin:1rem 0}.btn{padding:.6rem 1.3rem;font-size:clamp(.85rem,2vw,1.1rem);font-weight:600;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#ff5e2c,#c43818);color:#fff;transition:all .25s}.btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(255,94,44,.4)}.btn:active{transform:scale(.95)}.sm{font-size:clamp(.65rem,1.5vw,.75rem);color:#999;line-height:1.6;padding:.5rem;background:rgba(255,255,255,.03);border-radius:8px;margin:.8rem 0}.rec{color:#ffb833;font-size:.85rem}.ver{color:#555;font-size:.6rem;margin-top:.3rem;display:block}
-#hud{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;display:none}.hl{position:absolute;top:8px;left:8px}.hr{position:absolute;top:8px;right:8px;text-align:right}.hb{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);text-align:center}.hi{margin-bottom:.3rem}.hil{display:block;font-size:.45rem;color:#777;letter-spacing:.1em;text-transform:uppercase}.hiv{display:block;font-size:clamp(.85rem,2.5vw,1.2rem);font-weight:700;color:#fff;text-shadow:0 0 8px rgba(255,94,44,.3)}.stb{width:min(180px,50vw);height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin:0 auto 2px}.stf{height:100%;width:100%;border-radius:2px;transition:width .2s}.stl{font-size:.45rem;color:#777}#cl{position:absolute;bottom:16px;right:10px;font-size:.6rem;color:#888;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px}#biome{position:absolute;top:80px;left:8px;font-size:.5rem;color:#888}
-#ms{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:35;pointer-events:none;background:rgba(0,0,0,.55)}.msi{text-align:center;animation:mi .6s ease-out}.msi h2{font-size:clamp(1.5rem,4vw,2.5rem);color:#ffb833;text-shadow:0 0 40px rgba(255,184,51,.7)}.msv{font-size:clamp(3rem,7vw,4.5rem);font-weight:900;color:#fff;text-shadow:0 0 60px rgba(255,255,255,.8)}@keyframes mi{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
-.got{font-size:clamp(1.5rem,4vw,2.2rem)!important;color:#e04520!important}.gos{text-align:left;margin:1rem 0;line-height:2;background:rgba(255,255,255,.025);padding:.6rem 1rem;border-radius:10px;font-size:clamp(.7rem,1.6vw,.85rem)}.gos p{color:#ccc}.gos b{color:#ffb833}
-.rt{width:100%;border-collapse:collapse;font-size:clamp(.55rem,1.3vw,.7rem);margin:.5rem 0}.rt th{background:rgba(255,94,44,.15);padding:.3rem .2rem;color:#ffb833;font-size:.6rem}.rt td{padding:.25rem .2rem;border-bottom:1px solid rgba(255,255,255,.05);color:#bbb}.pr td{background:rgba(255,94,44,.12)!important;color:#fff!important;font-weight:700}.rs{max-height:30vh;overflow-y:auto;border-radius:8px;background:rgba(0,0,0,.2);margin:.4rem 0}#rp{color:#ffb833;font-size:.7rem;margin:.3rem 0}
-.dmg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,0,0,.2);z-index:25;pointer-events:none;animation:df .35s forwards}@keyframes df{0%{opacity:1}100%{opacity:0}}
-#lock-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:45;font-size:.9rem;color:#ccc;background:rgba(0,0,0,.7);padding:.5rem 1rem;border-radius:8px;display:none;pointer-events:none}
-#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;z-index:25;display:none;pointer-events:none}#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.4);border-radius:1px}#crosshair::before{width:2px;height:100%;left:7px;top:0}#crosshair::after{width:100%;height:2px;left:0;top:7px}
-#mc{position:fixed;bottom:12px;left:0;width:100%;display:none;justify-content:center;gap:5px;z-index:30;flex-wrap:wrap}.mcb{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:.9rem;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center}.mcb:active{background:rgba(255,94,44,.45)}.mcbb{width:56px;height:56px;font-size:.6rem;font-weight:700}
-@media(hover:hover){#mc{display:none!important}#crosshair{display:block!important}}
+<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Infinite Runner - MagnorioBR</title><style>
+*{margin:0;padding:0}body{background:#000;overflow:hidden;font-family:Arial}
+#load{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffb833;font-size:2rem;z-index:99}
+canvas{display:block}
 </style></head><body>
-<div id="loading"><div><h1>INFINITE RUNNER</h1><h2>WORLD TOUR</h2><div class="lbar"><div id="lbar"></div></div><p id="lt">Iniciando...</p><span id="la">MagnorioBR © 2026</span></div></div>
-<div id="menu" class="ov"><div class="box"><h1>INFINITE RUNNER</h1><h3>WORLD TOUR</h3><div class="btns"><button class="btn" id="bs">COMEÇAR CORRIDA</button><button class="btn" id="brk">RANKING</button></div><p class="sm" id="ctrl-hint"></p><p class="rec">Recorde: <span id="brec">0.00 km</span></p><span class="ver">v9.2 · MagnorioBR</span></div></div>
-<div id="rank" class="ov"><div class="box"><h2>RANKING</h2><div class="rs"><table class="rt"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th></tr></thead><tbody id="rb"></tbody></table></div><p id="rp"></p><button class="btn" id="bcr">FECHAR</button></div></div>
-<div id="lock-msg">Clique na tela para jogar</div><div id="crosshair"></div>
-<div id="hud"><div class="hl"><div class="hi"><span class="hil">DISTANCIA</span><span class="hiv" id="hd">0.00 km</span></div><div class="hi"><span class="hil">TEMPO</span><span class="hiv" id="ht">00:00</span></div></div><div class="hr"><div class="hi"><span class="hil">PROXIMO MARCO</span><span class="hiv" id="hn">1 km</span></div><div class="hi"><span class="hil">VELOCIDADE</span><span class="hiv" id="hs">0 km/h</span></div></div><div class="hb"><div class="stb"><div class="stf" id="sf"></div></div><span class="stl">STAMINA</span></div><div id="biome"></div><div id="cl"></div></div>
-<div id="ms"><div class="msi"><h2>MARCO ATINGIDO!</h2><div class="msv" id="msv">1 km</div></div></div>
-<div id="pause" class="ov"><div class="box"><h2>PAUSADO</h2><div class="btns"><button class="btn" id="bres">CONTINUAR</button><button class="btn" id="brst">REINICIAR</button><button class="btn" id="bqt">MENU</button></div></div></div>
-<div id="go" class="ov"><div class="box"><h2 class="got">GAME OVER</h2><div class="gos"><p>Distancia: <b id="gd">0 km</b></p><p>Tempo: <b id="gt">00:00</b></p><p>Maior Marco: <b id="gm">-</b></p></div><div class="btns"><button class="btn" id="brtry">TENTAR NOVAMENTE</button><button class="btn" id="bgm">MENU</button></div></div></div>
-<div id="mc"><button class="mcb" id="mcl">L</button><button class="mcb mcbb" id="mcj">PULO</button><button class="mcb mcbb" id="mcs">SPRINT</button><button class="mcb" id="mcr">R</button></div>
+<div id="load">CARREGANDO...</div>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
-<script type="module" src="WebBuild/game.js"></script>
-</body></html>
+<script type="module">
+import * as THREE from 'three';
+
+// ── CONFIG ──
+const BS=100,RW=10,SW=3,VD=300;
+const hr=RW/2,se=hr+SW;
+const $=id=>document.getElementById(id);
+
+// ── CANVAS TEXTURE GENERATOR ──
+function makeTex(color,noiseColor,count,size){
+  const c=document.createElement('canvas');c.width=256;c.height=256;
+  const x=c.getContext('2d');
+  x.fillStyle=color;x.fillRect(0,0,256,256);
+  if(noiseColor&&count>0){
+    for(let i=0;i<count;i++){
+      x.fillStyle=noiseColor;
+      const s=size||3;
+      x.fillRect(Math.random()*256,Math.random()*256,s,s);
+    }
+  }
+  const t=new THREE.CanvasTexture(c);
+  t.wrapS=THREE.RepeatWrapping;t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;
+  return t;
+}
+
+// ── TEXTURAS DO TERRENO ──
+const T={};
+T.asphalt=[];
+T.sidewalk=[];
+T.grass=[];
+T.dirt=[];
+T.sand=[];
+T.brick=[];
+
+for(let i=0;i<4;i++)T.asphalt.push(makeTex('#3d3d3f','#2a2a2c',6000,2));
+for(let i=0;i<3;i++)T.sidewalk.push(makeTex('#c8c0b8','#b0a8a0',4000,1));
+for(let i=0;i<3;i++)T.grass.push(makeTex('#4a8c3f','#3d7a35',8000,2));
+for(let i=0;i<3;i++)T.dirt.push(makeTex('#8b7355','#7d664a',6000,2));
+for(let i=0;i<3;i++)T.sand.push(makeTex('#e8d5b0','#ddc9a5',5000,1));
+for(let i=0;i<4;i++)T.brick.push(makeTex('#b8956a','#a0805a',3000,1));
+
+function getTex(pool,seed){
+  if(!pool||!pool.length)return T.asphalt[0];
+  const t=pool[Math.abs(seed)%pool.length].clone();
+  t.needsUpdate=true;return t;
+}
+
+// ── SCENE / RENDERER / CAMERA / LIGHT ──
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87CEEB);
+scene.fog=new THREE.Fog(0xCCDDFF,60,VD);
+
+const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,VD+100);
+cam.position.set(0,1.7,0);
+
+const rnd=new THREE.WebGLRenderer({antialias:true});
+rnd.setSize(innerWidth,innerHeight);
+rnd.setPixelRatio(Math.min(devicePixelRatio,2));
+rnd.shadowMap.enabled=true;
+document.body.appendChild(rnd.domElement);
+
+// ── LUZ FORTE ──
+const sun=new THREE.DirectionalLight(0xffffff,3);
+sun.position.set(60,100,40);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.near=1;sun.shadow.camera.far=500;
+sun.shadow.camera.left=-80;sun.shadow.camera.right=80;sun.shadow.camera.top=80;sun.shadow.camera.bottom=-80;
+scene.add(sun);
+scene.add(new THREE.AmbientLight(0x8899aa,2.0));
+scene.add(new THREE.HemisphereLight(0x88aacc,0x554433,1.0));
+
+// ── MATERIAIS ──
+const matCurb=new THREE.MeshLambertMaterial({color:0x999999});
+const matYel=new THREE.MeshLambertMaterial({color:0xffcc00});
+const matTree=new THREE.MeshLambertMaterial({color:0x6D4C41});
+const matLeaf=new THREE.MeshLambertMaterial({color:0x4a8c3f});
+
+// ── MUNDO (TERRENO 100% FOCO) ──
+const blocks=new Map();
+
+function mkBlock(bx,bz){
+  const k=bx+','+bz;if(blocks.has(k))return;
+  const seed=bx*374761393+bz*668265263;
+  
+  // ═══ TERRENO ═══
+  const geo=new THREE.PlaneGeometry(BS+.5,BS+.5,8,8);
+  geo.rotateX(-Math.PI/2);
+  const pos=geo.attributes.position.array;
+  for(let i=0;i<pos.length;i+=3){
+    const ax=Math.abs(pos[i]);
+    if(ax<hr)pos[i+1]=0;
+    else if(ax<se)pos[i+1]=0.15+(ax-hr)/SW*0.02;
+    else pos[i+1]=0.3+Math.sin(pos[i]*0.04)*0.15;
+  }
+  geo.computeVertexNormals();
+  
+  // Textura do chão
+  const gTex=getTex(T.asphalt,seed+bx+bz);
+  gTex.repeat.set(4,4);
+  const gMat=new THREE.MeshLambertMaterial({map:gTex});
+  const mesh=new THREE.Mesh(geo,gMat);mesh.receiveShadow=true;
+  
+  const g=new THREE.Group();g.add(mesh);
+  g.position.set(bx*BS,0,bz*BS);mesh.position.set(0,0,0);
+  
+  // ═══ MEIO-FIO ═══
+  const cGeo=new THREE.BoxGeometry(0.25,0.12,BS+.5);
+  for(let s=-1;s<=1;s+=2){
+    const curb=new THREE.Mesh(cGeo,matCurb);
+    curb.position.set(s*hr,0.06,0);curb.castShadow=true;curb.receiveShadow=true;
+    g.add(curb);
+  }
+  
+  // ═══ FAIXA AMARELA ═══
+  const dGeo=new THREE.PlaneGeometry(0.2,3);
+  for(let z=-48;z<48;z+=7){
+    const d=new THREE.Mesh(dGeo,matYel);
+    d.rotation.x=-Math.PI/2;d.position.set(0,0.016,z+3.5);
+    g.add(d);
+  }
+  
+  scene.add(g);blocks.set(k,{g,seed,pop:false});
+}
+
+function popBlock(key){
+  const bk=blocks.get(key);if(!bk||bk.pop)return;bk.pop=true;
+  const g=bk.g,seed=bk.seed;
+  let s=seed;
+  function r(){s=(s*16807)%2147483647;return(s-1)/2147483646;}
+  
+  const bzs=BS/2-se;
+  
+  // ═══ PRÉDIOS ═══
+  for(let side=-1;side<=1;side+=2){
+    const bxC=side*(se+bzs/2);
+    const nb=2+Math.floor(Math.abs(r())*3);
+    const bw=(BS-3)/nb;
+    for(let i=0;i<nb;i++){
+      const bzP=-BS/2+1.5+i*bw+bw/2;
+      const h=6+Math.abs(r())*35;
+      const bGeo=new THREE.BoxGeometry(bzs-0.3,h,bw-0.5);
+      const bTex=getTex(T.brick,seed+i*100+side*50);
+      bTex.repeat.set(0.7,Math.max(0.5,h/(bw-0.5)*0.7));
+      const bldg=new THREE.Mesh(bGeo,new THREE.MeshLambertMaterial({map:bTex}));
+      bldg.position.set(bxC,h/2,bzP);bldg.castShadow=true;bldg.receiveShadow=true;g.add(bldg);
+    }
+  }
+  
+  // ═══ ÁRVORES ═══
+  for(let side=-1;side<=1;side+=2){
+    const tx=side*(hr+SW/2);
+    for(let tz=-BS/2+5;tz<BS/2-5;tz+=12+r()*15){
+      if(Math.abs(r())<0.3)continue;
+      const tr=new THREE.Group();
+      const th=1.5+r()*3;
+      const tk=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.16,th,6),matTree);
+      tk.position.y=th/2;tk.castShadow=true;tr.add(tk);
+      for(let j=0;j<2+Math.floor(r()*3);j++){
+        const cr=0.5+r()*1.2;
+        const cn=new THREE.Mesh(new THREE.SphereGeometry(cr,6,4),matLeaf);
+        cn.position.set((r()-0.5)*1.4,th+0.3+r()*1.4,(r()-0.5)*1.4);
+        cn.castShadow=true;tr.add(cn);
+      }
+      tr.position.set(tx,0,tz);g.add(tr);
+    }
+  }
+}
+
+function updateWorld(pz){
+  const pbz=Math.floor(pz/BS),range=Math.ceil(VD/BS)+1;
+  const need=new Set();
+  for(let bz=pbz-range;bz<=pbz+range;bz++)for(let bx=-2;bx<=2;bx++)need.add(bx+','+bz);
+  for(const[k,v]of blocks){if(!need.has(k)){scene.remove(v.g);blocks.delete(k)}need.delete(k)}
+  for(const k of need){const[bx,bz]=k.split(',').map(Number);mkBlock(bx,bz)}
+  let d=0;for(const[k,v]of blocks){if(!v.pop&&d<2){popBlock(k);d++}}
+}
+
+// ── PLAYER ──
+const keys={};
+let sprinting=false,holding=false;
+const vel=new THREE.Vector3();
+const pos=new THREE.Vector3(0,1.7,0);
+let maxDist=0,stamina=100,alive=true,grounded=true,jumping=false,jv=0;
+let yaw=0,pitch=0,locked=false;
+
+window.addEventListener('keydown',e=>{
+  keys[e.key.toLowerCase()]=true;
+  if(e.key==='Shift')sprinting=true;
+});
+window.addEventListener('keyup',e=>{
+  keys[e.key.toLowerCase()]=false;
+  if(e.key==='Shift')sprinting=false;
+});
+
+// Mouse look
+rnd.domElement.addEventListener('click',()=>{if(!locked){rnd.domElement.requestPointerLock()}});
+document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===rnd.domElement});
+document.addEventListener('mousemove',e=>{if(!locked)return;yaw-=e.movementX*0.003;pitch-=e.movementY*0.003;pitch=Math.max(-1.2,Math.min(1.2,pitch))});
+
+// Mobile
+document.addEventListener('touchstart',()=>{keys['w']=true;holding=true});
+document.addEventListener('touchend',()=>{keys['w']=false;holding=false});
+
+// ── LOOP ──
+let lastT=performance.now();
+
+function loop(){
+  requestAnimationFrame(loop);
+  const n=performance.now();let dt=(n-lastT)/1000;lastT=n;dt=Math.min(dt,0.15);
+  
+  if(alive){
+    const spd=sprinting&&stamina>0?14:8;
+    const dir=new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch),-Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch)).normalize();
+    const right=new THREE.Vector3().crossVectors(dir,new THREE.Vector3(0,1,0)).normalize();
+    const move=new THREE.Vector3();
+    
+    if(keys['w']){move.add(dir);if(!sprinting)sprinting=keys['shift']&&stamina>0}
+    if(keys['s'])move.addScaledVector(dir,-0.5);
+    if(keys['a'])move.addScaledVector(right,-1);
+    if(keys['d'])move.addScaledVector(right,1);
+    
+    if(move.length()>0){move.normalize();vel.x+=(move.x*spd-vel.x)*Math.min(8*dt,1);vel.z+=(move.z*spd-vel.z)*Math.min(8*dt,1)}
+    else{vel.x*=Math.pow(0.1,dt);vel.z*=Math.pow(0.1,dt)}
+    
+    if(sprinting&&move.length()>0){stamina=Math.max(0,stamina-20*dt);if(stamina<=0)sprinting=false}
+    else stamina=Math.min(100,stamina+12*dt);
+    
+    if(keys[' ']&&grounded){jumping=true;jv=6;grounded=false}
+    if(jumping){jv-=15*dt;vel.y=jv}else if(!grounded)vel.y-=15*dt;
+    
+    pos.x+=vel.x*dt;pos.y+=vel.y*dt;pos.z+=vel.z*dt;
+    if(pos.y<=1.7){pos.y=1.7;vel.y=0;grounded=true;jumping=false}
+    if(pos.z>maxDist)maxDist=pos.z;
+    
+    cam.position.copy(pos);
+    cam.rotation.order='YXZ';cam.rotation.set(pitch,yaw,0);
+    
+    if(Math.abs(pos.x)>se+bz2){vel.x*=-0.3;pos.x=Math.sign(pos.x)*(se+bz2)}
+    
+    updateWorld(pos.z);
+  }
+  
+  // Dia/noite
+  const hp=(pos.z/1000)/5,dc=((8+hp)%24)/24,sa=dc*Math.PI*2,sh=Math.sin(sa);
+  sun.position.set(Math.cos(sa)*100,sh*100,30);
+  const i=Math.max(0.15,sh+0.25);
+  sun.intensity=i*4;
+  if(sh>-0.1)scene.background=new THREE.Color(0.35+sh*0.3,0.55+sh*0.3,0.82+sh*0.18);
+  else{const nf=Math.abs(sh);scene.background=new THREE.Color(0.04+nf*0.06,0.04+nf*0.06,0.12+nf*0.1)}
+  
+  rnd.render(scene,cam);
+}
+
+// ── START ──
+$('load').textContent='GERANDO TERRENO...';
+// Pre-gera mundo inicial
+updateWorld(0);
+$('load').style.display='none';
+loop();
+console.log('🏃 Infinite Runner v10 - MagnorioBR - TERRENO 100%');
+</script></body></html>
