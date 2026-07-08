@@ -4,140 +4,89 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Infinite Runner: World Tour – MagnorioBR</title>
+<title>Infinite Runner: World Tour - MagnorioBR</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+body{overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;user-select:none;-webkit-user-select:none;touch-action:none}
 canvas{display:block;position:fixed;top:0;left:0;z-index:1}
-#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
-#ui>*{pointer-events:auto}
-#loading{position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0d0d2b 0%,#020210 100%)}
-.load-c{text-align:center}
-.load-c h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.25em;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gl 2s ease-in-out infinite}
-.load-c h2{font-size:clamp(1rem,3vw,1.6rem);font-weight:300;letter-spacing:.4em;color:#bbb;margin:.5rem 0 2rem}
+#loading{position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0d0d2b,#020210)}
+.lc{text-align:center}
+.lc h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.2em;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gl 2s infinite}
+.lc h2{font-size:clamp(1rem,3vw,1.6rem);font-weight:300;letter-spacing:.35em;color:#bbb;margin:.5rem 0 2rem}
 @keyframes gl{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
-.load-bar{width:min(360px,75vw);height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin:1rem auto;overflow:hidden}
-.load-bar div{height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#ff5e2c,#ffb833);transition:width .35s}
-#load-t{color:#888;font-size:.85rem;margin:.5rem 0}
-#load-a{color:#555;font-size:.7rem;margin-top:1.5rem;display:block}
-
-#menu,#rank,#conf,#pause,#go{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:50;background:rgba(0,0,0,.82);backdrop-filter:blur(6px)}
-.mb{text-align:center;padding:clamp(1rem,3vw,2.5rem) clamp(1.5rem,5vw,3rem);border:1.5px solid rgba(255,94,44,.3);border-radius:20px;background:rgba(8,8,25,.94);min-width:min(360px,90vw);max-width:95vw}
-.mb h2{font-size:clamp(1.3rem,4vw,2rem);margin-bottom:1.2rem;color:#ffb833;font-weight:700}
-.mb h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.2em;margin-bottom:.3rem;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.mb h3{font-size:clamp(.9rem,2.5vw,1.3rem);font-weight:300;letter-spacing:.35em;color:#bbb;margin-bottom:1.8rem}
-.btns{display:flex;flex-direction:column;gap:.7rem;margin:1rem 0}
-.btn{padding:.65rem 1.4rem;font-size:clamp(.85rem,2.2vw,1.1rem);font-weight:600;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#ff5e2c,#c43818);color:#fff;transition:all .25s;letter-spacing:.05em;font-family:inherit}
-.btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(255,94,44,.4);background:linear-gradient(135deg,#ffb833,#ff5e2c)}
+.lbar{width:min(360px,75vw);height:5px;background:rgba(255,255,255,.08);border-radius:3px;margin:1rem auto;overflow:hidden}
+.lbar div{height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#ff5e2c,#ffb833);transition:width .35s}
+#lt{color:#888;font-size:.85rem;margin:.5rem 0}
+#la{color:#555;font-size:.7rem;margin-top:1.5rem;display:block}
+.ov{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:50;background:rgba(0,0,0,.82);backdrop-filter:blur(6px)}
+.box{text-align:center;padding:clamp(1rem,3vw,2.5rem) clamp(1.5rem,5vw,3rem);border:1.5px solid rgba(255,94,44,.3);border-radius:20px;background:rgba(8,8,25,.94);min-width:min(360px,88vw);max-width:92vw}
+.box h2{font-size:clamp(1.3rem,4vw,2rem);margin-bottom:1rem;color:#ffb833}
+.box h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;letter-spacing:.15em;margin-bottom:.3rem;background:linear-gradient(180deg,#ff5e2c,#ffb833,#ff5e2c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.box h3{font-size:clamp(.9rem,2.5vw,1.3rem);font-weight:300;letter-spacing:.3em;color:#bbb;margin-bottom:1.5rem}
+.btns{display:flex;flex-direction:column;gap:.6rem;margin:1rem 0}
+.btn{padding:.6rem 1.3rem;font-size:clamp(.85rem,2.2vw,1.1rem);font-weight:600;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#ff5e2c,#c43818);color:#fff;transition:all .25s;letter-spacing:.05em}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(255,94,44,.4)}
 .btn:active{transform:scale(.96)}
 .sm{font-size:clamp(.7rem,1.6vw,.8rem);color:#999;line-height:1.6;padding:.5rem;background:rgba(255,255,255,.03);border-radius:8px;margin:.8rem 0}
-.rec{color:#ffb833;font-size:.9rem;margin-top:.5rem}
-.ver{color:#555;font-size:.65rem;margin-top:.4rem;display:block}
-
+.rec{color:#ffb833;font-size:.9rem}
+.ver{color:#555;font-size:.65rem;margin-top:.3rem;display:block}
 #hud{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;display:none}
-.hl{position:absolute;top:12px;left:12px}
-.hr{position:absolute;top:12px;right:12px;text-align:right}
-.hb{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);text-align:center}
-.hi{margin-bottom:.4rem}
-.hil{display:block;font-size:clamp(.45rem,1.3vw,.55rem);color:#777;letter-spacing:.12em;text-transform:uppercase}
-.hiv{display:block;font-size:clamp(.95rem,2.8vw,1.4rem);font-weight:700;color:#fff;text-shadow:0 0 10px rgba(255,94,44,.4)}
-.st-bg{width:min(220px,60vw);height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:0 auto 3px}
-.st-f{height:100%;width:100%;border-radius:2px;transition:width .2s,background .3s}
-.st-l{font-size:.55rem;color:#777;letter-spacing:.08em}
-#wi{position:absolute;bottom:20px;right:14px;font-size:1.3rem}
+.hl{position:absolute;top:10px;left:10px}
+.hr{position:absolute;top:10px;right:10px;text-align:right}
+.hb{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);text-align:center}
+.hi{margin-bottom:.35rem}
+.hil{display:block;font-size:clamp(.45rem,1.2vw,.55rem);color:#777;letter-spacing:.1em;text-transform:uppercase}
+.hiv{display:block;font-size:clamp(.9rem,2.5vw,1.3rem);font-weight:700;color:#fff;text-shadow:0 0 8px rgba(255,94,44,.35)}
+.stb{width:min(200px,55vw);height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:0 auto 3px}
+.stf{height:100%;width:100%;border-radius:2px;transition:width .2s}
+.stl{font-size:.5rem;color:#777;letter-spacing:.06em}
+#cl{position:absolute;bottom:18px;right:12px;font-size:.65rem;color:#888;background:rgba(0,0,0,.5);padding:2px 8px;border-radius:4px}
+#biome{position:absolute;top:90px;left:10px;font-size:clamp(.5rem,1.2vw,.6rem);color:#888;letter-spacing:.08em}
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;z-index:25;display:none;pointer-events:none}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.5);border-radius:1px}
+#crosshair::before{width:2px;height:100%;left:9px;top:0}
+#crosshair::after{width:100%;height:2px;left:0;top:9px}
 #ms{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:35;pointer-events:none;background:rgba(0,0,0,.55)}
-.ms-i{text-align:center;animation:mi .6s ease-out}
-.ms-i h2{font-size:clamp(1.8rem,5vw,2.8rem);color:#ffb833;text-shadow:0 0 50px rgba(255,184,51,.7)}
-.ms-i .ms-v{font-size:clamp(3rem,8vw,5rem);font-weight:900;color:#fff;text-shadow:0 0 70px rgba(255,255,255,.8)}
+.msi{text-align:center;animation:mi .6s ease-out}
+.msi h2{font-size:clamp(1.5rem,4vw,2.5rem);color:#ffb833;text-shadow:0 0 40px rgba(255,184,51,.7)}
+.msv{font-size:clamp(3rem,7vw,4.5rem);font-weight:900;color:#fff;text-shadow:0 0 60px rgba(255,255,255,.8)}
 @keyframes mi{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
-
-.go-t{font-size:clamp(1.8rem,5vw,2.5rem)!important;color:#e04520!important;text-shadow:0 0 25px rgba(224,69,32,.5)}
-.go-s{text-align:left;margin:1rem 0;line-height:2;background:rgba(255,255,255,.025);padding:.7rem 1rem;border-radius:10px;font-size:clamp(.7rem,1.8vw,.85rem)}
-.go-s p{color:#ccc}.go-s b{color:#ffb833}
-
-.rt{width:100%;border-collapse:collapse;font-size:clamp(.6rem,1.6vw,.78rem);margin:.6rem 0}
-.rt th{background:rgba(255,94,44,.15);padding:.4rem .3rem;color:#ffb833;font-size:.7rem;position:sticky;top:0}
-.rt td{padding:.35rem .3rem;border-bottom:1px solid rgba(255,255,255,.05);color:#bbb}
-.rt .pr td{background:rgba(255,94,44,.12)!important;color:#fff!important;font-weight:700}
-.rs{max-height:40vh;overflow-y:auto;border-radius:8px;background:rgba(0,0,0,.2);margin:.5rem 0}
-#rp{color:#ffb833;font-size:.8rem;margin:.4rem 0}
-
+.got{font-size:clamp(1.5rem,4vw,2.2rem)!important;color:#e04520!important;text-shadow:0 0 20px rgba(224,69,32,.5)}
+.gos{text-align:left;margin:1rem 0;line-height:2;background:rgba(255,255,255,.025);padding:.6rem 1rem;border-radius:10px;font-size:clamp(.7rem,1.6vw,.85rem)}
+.gos p{color:#ccc}.gos b{color:#ffb833}
+.rt{width:100%;border-collapse:collapse;font-size:clamp(.55rem,1.4vw,.72rem);margin:.5rem 0}
+.rt th{background:rgba(255,94,44,.15);padding:.35rem .25rem;color:#ffb833;font-size:.65rem;position:sticky;top:0}
+.rt td{padding:.3rem .25rem;border-bottom:1px solid rgba(255,255,255,.05);color:#bbb}
+.pr td{background:rgba(255,94,44,.12)!important;color:#fff!important;font-weight:700}
+.rs{max-height:35vh;overflow-y:auto;border-radius:8px;background:rgba(0,0,0,.2);margin:.4rem 0}
+#rp{color:#ffb833;font-size:.75rem;margin:.3rem 0}
 .sr{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.05);gap:.8rem}
-.sr label{color:#ccc;font-size:.85rem;white-space:nowrap}
-.sr input[type=range]{flex:1;max-width:140px;accent-color:#ff5e2c}
-.sr select{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:.25rem .4rem;font-family:inherit;font-size:.85rem}
-
+.sr label{color:#ccc;font-size:.8rem;white-space:nowrap}
+.sr input[type=range]{flex:1;max-width:130px;accent-color:#ff5e2c}
+.sr select{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:.2rem .4rem;font-size:.8rem}
 .dmg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,0,0,.22);z-index:25;pointer-events:none;animation:df .35s forwards}
 @keyframes df{0%{opacity:1}100%{opacity:0}}
-
-#mc{position:fixed;bottom:18px;left:0;width:100%;display:none;justify-content:center;gap:8px;z-index:30;padding:0 8px;flex-wrap:wrap}
-.mcb{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:1.1rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;user-select:none}
+#lock-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:45;font-size:clamp(.9rem,2vw,1.2rem);color:#ccc;background:rgba(0,0,0,.7);padding:.6rem 1.2rem;border-radius:8px;display:none;pointer-events:none}
+#mc{position:fixed;bottom:14px;left:0;width:100%;display:none;justify-content:center;gap:6px;z-index:30;flex-wrap:wrap}
+.mcb{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:1rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
 .mcb:active{background:rgba(255,94,44,.45)}
-.mcbb{width:66px;height:66px;font-size:.7rem;font-weight:700}
-
-@media(min-width:1024px){#mc{display:none!important}}
+.mcbb{width:60px;height:60px;font-size:.65rem;font-weight:700}
+@media(min-width:1024px){#mc{display:none!important}#crosshair{display:block!important}}
 </style>
 </head>
 <body>
-
-<div id="loading"><div class="load-c">
-<h1>INFINITE RUNNER</h1><h2>WORLD TOUR</h2>
-<div class="load-bar"><div id="lbar"></div></div>
-<p id="load-t">Iniciando motor…</p><span id="load-a">MagnorioBR © 2026</span>
-</div></div>
-
-<div id="menu"><div class="mb">
-<h1>INFINITE RUNNER</h1><h3>WORLD TOUR</h3>
-<div class="btns"><button class="btn" id="bs">🏃 COMEÇAR CORRIDA</button>
-<button class="btn" id="brk">🏆 RANKING</button>
-<button class="btn" id="bcf">⚙️ CONFIGURAÇÕES</button></div>
-<p class="sm">W=Correr · A/D=Desviar · Shift=Sprint · Espaço=Pular · ESC=Pausa</p>
-<p class="rec">🏅 Recorde: <span id="brec">0.00 km</span></p>
-<span class="ver">v4.0 · MagnorioBR</span>
-</div></div>
-
-<div id="rank"><div class="mb">
-<h2>🏆 RANKING GLOBAL</h2>
-<div class="rs"><table class="rt"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th><th>Tempo</th></tr></thead><tbody id="rb"></tbody></table></div>
-<p id="rp"></p><button class="btn" id="bcr">FECHAR</button>
-</div></div>
-
-<div id="conf"><div class="mb">
-<h2>⚙️ CONFIGURAÇÕES</h2>
-<div class="sr"><label>Música</label><input type="range" id="vm" min="0" max="100" value="50"></div>
-<div class="sr"><label>Efeitos</label><input type="range" id="ve" min="0" max="100" value="80"></div>
-<div class="sr"><label>Clima</label><select id="wm"><option value="auto">Automático</option><option value="clear">Limpo</option><option value="rain">Chuva</option></select></div>
-<button class="btn" id="bcc">FECHAR</button>
-</div></div>
-
-<div id="hud">
-<div class="hl"><div class="hi"><span class="hil">DISTÂNCIA</span><span class="hiv" id="hd">0.00 km</span></div><div class="hi"><span class="hil">TEMPO</span><span class="hiv" id="ht">00:00</span></div><div class="hi"><span class="hil">RITMO</span><span class="hiv" id="hp">--:-- /km</span></div></div>
-<div class="hr"><div class="hi"><span class="hil">PRÓXIMO MARCO</span><span class="hiv" id="hn">1 km</span></div><div class="hi"><span class="hil">VELOCIDADE</span><span class="hiv" id="hs">0 km/h</span></div><div class="hi"><span class="hil">RECORDE</span><span class="hiv" id="hrc">0 km</span></div></div>
-<div class="hb"><div class="st-bg"><div class="st-f" id="sf"></div></div><span class="st-l">STAMINA</span></div>
-<div id="wi"></div>
-</div>
-
-<div id="ms"><div class="ms-i"><h2>🏅 MARCO ATINGIDO!</h2><div class="ms-v" id="msv">1 km</div></div></div>
-
-<div id="pause"><div class="mb"><h2>⏸️ PAUSADO</h2><div class="btns"><button class="btn" id="bres">▶️ CONTINUAR</button><button class="btn" id="brst">🔄 REINICIAR</button><button class="btn" id="bqt">🏠 MENU</button></div></div></div>
-
-<div id="go"><div class="mb">
-<h2 class="go-t">💀 GAME OVER</h2>
-<div class="go-s"><p>Distância: <b id="gd">0 km</b></p><p>Tempo: <b id="gt">00:00</b></p><p>Maior Marco: <b id="gm">-</b></p><p>Velocidade Média: <b id="gs">0 km/h</b></p></div>
-<p id="gmsg" style="color:#ffb833;font-size:.8rem;margin:.5rem 0"></p>
-<div class="btns"><button class="btn" id="brtry">🔄 TENTAR NOVAMENTE</button><button class="btn" id="bgm">🏠 MENU</button></div>
-</div></div>
-
-<div id="mc">
-<button class="mcb" id="mcl">◀</button>
-<button class="mcb mcbb" id="mcj">PULAR</button>
-<button class="mcb mcbb" id="mcs">SPRINT</button>
-<button class="mcb" id="mcr">▶</button>
-</div>
-
-<script type="importmap">
-{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
-</script>
+<div id="loading"><div class="lc"><h1>INFINITE RUNNER</h1><h2>WORLD TOUR</h2><div class="lbar"><div id="lbar"></div></div><p id="lt">Iniciando...</p><span id="la">MagnorioBR</span></div></div>
+<div id="menu" class="ov"><div class="box"><h1>INFINITE RUNNER</h1><h3>WORLD TOUR</h3><div class="btns"><button class="btn" id="bs">COMEÇAR CORRIDA</button><button class="btn" id="brk">RANKING</button><button class="btn" id="bcf">CONFIGURAÇÕES</button></div><p class="sm"><b>Mouse:</b> Olhar ao redor · <b>W:</b> Correr · <b>A/D:</b> Desviar · <b>Shift:</b> Sprint · <b>Espaço:</b> Pular · <b>ESC:</b> Pausa</p><p class="rec">Recorde: <span id="brec">0.00 km</span></p><span class="ver">v5.0 · MagnorioBR</span></div></div>
+<div id="rank" class="ov"><div class="box"><h2>RANKING</h2><div class="rs"><table class="rt"><thead><tr><th>#</th><th>Jogador</th><th>Dist</th><th>Marcos</th><th>Tempo</th></tr></thead><tbody id="rb"></tbody></table></div><p id="rp"></p><button class="btn" id="bcr">FECHAR</button></div></div>
+<div id="conf" class="ov"><div class="box"><h2>CONFIGURAÇÕES</h2><div class="sr"><label>Musica</label><input type="range" id="vm" min="0" max="100" value="50"></div><div class="sr"><label>Efeitos</label><input type="range" id="ve" min="0" max="100" value="80"></div><div class="sr"><label>Mouse</label><input type="range" id="vs" min="1" max="10" value="3"></div><button class="btn" id="bcc">FECHAR</button></div></div>
+<div id="lock-msg">Clique na tela para jogar</div>
+<div id="crosshair"></div>
+<div id="hud"><div class="hl"><div class="hi"><span class="hil">DISTÂNCIA</span><span class="hiv" id="hd">0.00 km</span></div><div class="hi"><span class="hil">TEMPO</span><span class="hiv" id="ht">00:00</span></div><div class="hi"><span class="hil">RITMO</span><span class="hiv" id="hp">--:-- /km</span></div></div><div class="hr"><div class="hi"><span class="hil">PROXIMO MARCO</span><span class="hiv" id="hn">1 km</span></div><div class="hi"><span class="hil">VELOCIDADE</span><span class="hiv" id="hs">0 km/h</span></div><div class="hi"><span class="hil">RECORDE</span><span class="hiv" id="hrc">0 km</span></div></div><div class="hb"><div class="stb"><div class="stf" id="sf"></div></div><span class="stl">STAMINA</span></div><div id="biome"></div><div id="cl"></div></div>
+<div id="ms"><div class="msi"><h2>MARCO ATINGIDO!</h2><div class="msv" id="msv">1 km</div></div></div>
+<div id="pause" class="ov"><div class="box"><h2>PAUSADO</h2><div class="btns"><button class="btn" id="bres">CONTINUAR</button><button class="btn" id="brst">REINICIAR</button><button class="btn" id="bqt">MENU</button></div></div></div>
+<div id="go" class="ov"><div class="box"><h2 class="got">GAME OVER</h2><div class="gos"><p>Distancia: <b id="gd">0 km</b></p><p>Tempo: <b id="gt">00:00</b></p><p>Maior Marco: <b id="gm">-</b></p><p>Velocidade Media: <b id="gs">0 km/h</b></p></div><p id="gmsg" style="color:#ffb833;font-size:.8rem;margin:.5rem 0"></p><div class="btns"><button class="btn" id="brtry">TENTAR NOVAMENTE</button><button class="btn" id="bgm">MENU</button></div></div></div>
+<div id="mc"><button class="mcb" id="mcl">L</button><button class="mcb mcbb" id="mcj">PULO</button><button class="mcb mcbb" id="mcs">CORRER</button><button class="mcb" id="mcr">R</button></div>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="game.js"></script>
 </body>
 </html>
